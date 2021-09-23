@@ -2,21 +2,30 @@ use std::error::Error;
 mod model;
 use model::parser::Parser;
 use model::error::{AppResult, InternalError};
-//use model::request::Request;
+use model::request_handler::RequestHandler;
+use std::collections::LinkedList;
 
-
-fn procesar(path: &str) -> AppResult<()>{
+fn process_requests(path: &str) -> AppResult<()>{
 
     let mut parser = Parser::open(std::path::Path::new(path))?;
-
+    let mut handlers: LinkedList<RequestHandler> = LinkedList::new();
     loop {
         match parser.parse_request()? {
             None => break,  //Finalizamos
-
             Some(request) => {
                 //Levantar thread
-                println!("{:?}", request)
+                match RequestHandler::spawn(request) {
+                    Ok(handler) => handlers.push_back(handler),
+                    Err(error) => println!("{:?}", error) //Esto deberia ser un llamado a Logger.log_error
+                };
             }
+        }
+    }
+
+    for handler in handlers{
+        match handler.join() {
+            Err(error) => println!("{:?}", error),
+            Ok(_) => {}
         }
     }
 
@@ -30,5 +39,5 @@ fn main() -> Result<(), Box<dyn Error>> {
         None => return Err(Box::new(InternalError::new("Usage: cargo run <path-to-input-file>")))
     };
 
-    procesar(&path[..])
+    process_requests(&path[..])
 }
