@@ -20,4 +20,12 @@ impl Request {
 
         Ok(request)
     }
+
+    pub fn get_airline(&self) -> &str {
+        &self.airline[..]
+    }
+
+    pub fn is_package(&self) -> bool {
+        self.with_hotel
+    }
 }

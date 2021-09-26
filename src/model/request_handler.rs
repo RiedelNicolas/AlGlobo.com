@@ -1,29 +1,37 @@
 use super::error::AppResult;
 use super::request::Request;
+use super::web_service_provider::WebServiceProvider;
+use super::web_service_connection::WebServiceConnection;
 use std::thread::{self, JoinHandle};
-use std::time::Duration;
 
-#[derive(Debug)]
 pub struct RequestHandler {
     handle: Option<JoinHandle<()>>
-    //finished: bool
 }
 
 impl RequestHandler {
-    pub fn spawn(request: Request) -> AppResult<Self> {
-
+    pub fn spawn(request: Request, provider: &mut WebServiceProvider) -> AppResult<Self> {
+        let connection = provider.airline_request(request.get_airline());
         let handler = RequestHandler {
-            handle: Some(thread::spawn( move || RequestHandler::process_request(request))),
-            //finished: false
+            handle: Some(thread::spawn( move || RequestHandler::process_request(request, connection)))
         };
 
         Ok(handler)
     }
 
-    fn process_request(request: Request) {
-        println!("Trying to connect to extern web-service");
-        std::thread::sleep(Duration::from_secs(3));
-        println!("Connection established");
+    fn process_request(request: Request, connection: WebServiceConnection) {
+        println!("Trying to connect to extern airline web-service");
+        loop {
+            if let Ok(_) = connection.resolve_airline_request() {
+                break;
+            }
+            println!("Error trying to resolve airline request. Retrying...");
+        }
+
+        if request.is_package(){
+            println!("Trying to connect to extern airline web-service");
+            connection.resolve_hotel_request();
+        }
+        
         println!("{:?}", request);
         println!("Finished");
     }
