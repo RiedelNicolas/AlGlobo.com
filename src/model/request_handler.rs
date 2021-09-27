@@ -28,7 +28,7 @@ impl RequestHandler {
         }
 
         if request.is_package(){
-            println!("Trying to connect to extern airline web-service");
+            println!("Trying to connect to extern hotel web-service");
             connection.resolve_hotel_request();
         }
         
