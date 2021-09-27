@@ -1,4 +1,4 @@
-use super::error::{AppResult, InternalError};
+use super::error::{AppResult};
 use std::time::{Duration, Instant};
 
 #[derive(Debug)]
@@ -7,6 +7,7 @@ pub struct Request {
     destiny: String,
     airline: String,
     with_hotel: bool,
+    stages: u32,
     arrival_time: Instant,
     completion_time: Duration
 }
@@ -18,6 +19,7 @@ impl Request {
             destiny: destiny.to_string(),
             airline: airline.to_string(),
             with_hotel,
+            stages: 1 + (with_hotel as u32),
             arrival_time: Instant::now(),
             completion_time: Duration::from_secs(0)
         };
@@ -34,7 +36,14 @@ impl Request {
     }
 
     pub fn finish(&mut self) {
-        self.completion_time = self.arrival_time.elapsed();
+        if self.stages > 0 {
+            self.completion_time = self.arrival_time.elapsed();
+            self.stages -= 1;
+        }
+    }
+
+    pub fn has_finished(&self) -> bool {
+        self.stages == 0
     }
 
     pub fn get_completion_time(&self) -> &Duration {

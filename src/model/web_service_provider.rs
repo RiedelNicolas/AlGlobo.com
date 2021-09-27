@@ -31,7 +31,13 @@ impl WebServiceProvider {
                 sema
             }
         };
+        //Esto deberia levantarse de un ENV
+        WebServiceConnection::new(semaphore, 1000..4000, 0.3)
+    }
 
-        WebServiceConnection::new(semaphore, self.hotels.clone())
+
+    pub fn hotel_request(&mut self) -> WebServiceConnection {
+        //Esto deberia levantarse de un ENV
+        WebServiceConnection::new(self.hotels.clone(), 1000..2000, 0.0)
     }
 }

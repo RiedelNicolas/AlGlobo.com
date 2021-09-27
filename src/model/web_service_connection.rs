@@ -1,47 +1,40 @@
 use super::error::{AppResult, InternalError};
 use std_semaphore::Semaphore;
+use std::ops::Range;
 use std::sync::Arc;
 use std::{thread, time};
 use rand::Rng;
 
 pub struct WebServiceConnection {
-    airline: Arc<Semaphore>,
-    hotel: Arc<Semaphore>
+    permission: Arc<Semaphore>,
+    work_time_range: Range<u64>,
+    failure_probability: f32
 }
 
 impl WebServiceConnection {
-    pub fn new(airline: Arc<Semaphore>, hotel: Arc<Semaphore>) -> Self {
-
+    
+    pub fn new(permission: Arc<Semaphore>, work_time_range: Range<u64>, failure_probability: f32) -> Self {
         let connection = WebServiceConnection {
-            airline,
-            hotel
+            permission,
+            work_time_range,
+            failure_probability,
         };
 
         connection
     }
 
-    pub fn resolve_airline_request(&self) -> AppResult<()> {
-        self.airline.acquire();
-        println!("Connection with airline web service established");
+    pub fn resolve_request(&self) -> AppResult<()> {
+        self.permission.acquire();
         let mut rng = rand::thread_rng();
-        let work_time = rng.gen_range(1000..4000);
-        let ok = rng.gen::<f32>() > 0.3; //Esto deberia levantarse de un ENV
+        let work_time = rng.gen_range(self.work_time_range.clone());
+        let ok = rng.gen::<f32>() >= self.failure_probability; //Esto deberia levantarse de un ENV
         thread::sleep(time::Duration::from_millis(work_time));
-        self.airline.release();
+        self.permission.release();
 
         if ok { 
             Ok(()) 
         } else { 
             Err(Box::new(InternalError::new("Operation couldn't be done, please retry"))) 
         }
-    }
-
-    pub fn resolve_hotel_request(&self) {
-        self.hotel.acquire();
-        let mut rng = rand::thread_rng();
-        let work_time = rng.gen_range(1000..4000);
-        println!("Connection with hotel web service established");
-        thread::sleep(time::Duration::from_millis(work_time));
-        self.hotel.release();
     }
 }
