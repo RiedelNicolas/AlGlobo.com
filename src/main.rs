@@ -25,7 +25,7 @@ fn process_requests(path: &str) -> AppResult<()>{
         }
     }
 
-    for handler in handlers{
+    for handler in handlers {
         if let Err(error) = handler.join() {
             println!("{:?}", error)
         }
