@@ -1,2 +1,8 @@
-pub struct logger {
+enum MessageType {
+    Error,
+    Warning,
+    Info
+}
+
+pub struct Logger {
 }
