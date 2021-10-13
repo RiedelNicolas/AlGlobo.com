@@ -8,6 +8,3 @@ pub struct Message {
     type:MessageType,
     text:String
 }
-
-pub struct Logger {
-}
