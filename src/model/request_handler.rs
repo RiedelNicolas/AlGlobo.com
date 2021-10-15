@@ -1,9 +1,11 @@
+use super::env::Configuration;
 use super::error::AppResult;
 use super::request::Request;
 use super::web_service_provider::WebServiceProvider;
 use super::web_service_connection::WebServiceConnection;
+use super::statistics::InfoRequest;
 use std::thread::{self, JoinHandle};
-use std::time;
+use std::time::{self, Duration};
 use std::sync::{Arc, RwLock};
 
 pub struct RequestHandler {
@@ -13,7 +15,7 @@ pub struct RequestHandler {
 }
 
 impl RequestHandler {
-    pub fn spawn(req: Request, provider: &mut WebServiceProvider) -> AppResult<Self> {
+    pub fn spawn(req: Request, provider: &mut WebServiceProvider, envs: &Configuration) -> AppResult<Self> {
         let connection = provider.airline_request(req.get_airline());
         let is_package = req.is_package();
         let protected_request_local = Arc::new(RwLock::new(req));
@@ -64,8 +66,17 @@ impl RequestHandler {
         }
     }
     
-    pub fn join(self) {
+    pub fn join(self) -> InfoRequest { // VER SI PUEDE FALLAR JOIN QUE HACER
         if let Some(airline) = self.airline { let _ = airline.join(); }
         if let Some(hotel) = self.hotel { let _ = hotel.join(); }
+        match self.request.write() {
+            Ok(req) => {
+                InfoRequest::new(req.get_route(), *req.get_completion_time())
+            },
+            Err(_) => {
+                println!("Fatal error: Poisoned Lock"); //No me gusta mucho esto
+                InfoRequest::new(String::new(), Duration::from_secs(0)) // CAMBIAR ESTO
+            }
+        }
     }
 }

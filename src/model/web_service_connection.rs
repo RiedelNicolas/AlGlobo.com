@@ -27,7 +27,7 @@ impl WebServiceConnection {
         self.permission.acquire();
         let mut rng = rand::thread_rng();
         let work_time = rng.gen_range(self.work_time_range.clone());
-        let ok = rng.gen::<f32>() >= self.failure_probability; //Esto deberia levantarse de un ENV
+        let ok = rng.gen::<f32>() >= self.failure_probability;
         thread::sleep(time::Duration::from_millis(work_time));
         self.permission.release();
 

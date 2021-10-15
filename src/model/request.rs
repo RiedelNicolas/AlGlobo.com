@@ -30,22 +30,26 @@ impl Request {
     pub fn get_airline(&self) -> &str {
         &self.airline[..]
     }
-
+    
     pub fn is_package(&self) -> bool {
         self.with_hotel
     }
-
+    
     pub fn finish(&mut self) {
         if self.stages > 0 {
             self.completion_time = self.arrival_time.elapsed();
             self.stages -= 1;
         }
     }
-
+    
     pub fn has_finished(&self) -> bool {
         self.stages == 0
     }
 
+    pub fn get_route(&self) -> String {
+        format!("{}->{}", self.origin, self.destiny).to_string()
+    }
+    
     pub fn get_completion_time(&self) -> &Duration {
         &self.completion_time
     }
