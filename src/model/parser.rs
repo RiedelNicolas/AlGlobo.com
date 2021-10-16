@@ -1,51 +1,74 @@
-use super::error::{AppResult};
-use regex::Regex;
+use crate::model::administrator::NewRequest;
+
 use super::request::Request;
-
-#[derive(Debug)]
-pub struct Parser {
-    reader: io::BufReader<File>,
-    matcher: Regex
-}
-
+use super::administrator::Administrator;
+use super::error::AppResult;
+use actix::prelude::*;
+use regex::Regex;
 use std::{
     fs::File,
     io::{self, prelude::*}
 };
 
+#[derive(Message)]
+#[rtype(result = "")]
+pub struct ReadNextLine;
+
+pub struct Parser {
+    reader: io::BufReader<File>,
+    matcher: Regex,
+    admin: Addr<Administrator>
+}
+
 impl Parser {
-    pub fn open(path: impl AsRef<std::path::Path>) -> AppResult<Self> {
+    
+    pub fn open(path: impl AsRef<std::path::Path>, admin: Addr<Administrator>) -> AppResult<Self> {
         let file = File::open(path)?;
 
         let parser = Parser {
             reader: io::BufReader::new(file),
-            matcher: Regex::new(r"^([A-Z]{3}),([A-Z]{3}),([A-z]+),([PV])$")?
+            matcher: Regex::new(r"^([A-Z]{3}),([A-Z]{3}),([A-z]+),([PV])$")?,
+            admin
         };
 
         Ok(parser)
     }
+}
 
-    pub fn parse_request(&mut self) -> AppResult<Option<Request>> {
+impl Actor for Parser {
+    type Context = Context<Self>;
+}
+
+impl Handler<ReadNextLine> for Parser {
+    type Result = ();
+
+    fn handle(&mut self, msg: ReadNextLine, ctx: &mut Context<Self>) -> Self::Result {
 
         loop {
             let mut buffer = vec![];
-
-            let bytes = self.reader.read_until(b'\n', &mut buffer)?;
+            //CAMBIAR ESTE UNWRAP, ESTA MAAAAL
+            let bytes = self.reader.read_until(b'\n', &mut buffer).unwrap();
    
             if bytes == 0 {
-                return Ok(None)
+                return
             }
-
-            let buffer = String::from_utf8(buffer)?.replace("\n", "");
+            //CAMBIAR ESTE UNWRAP
+            let buffer = String::from_utf8(buffer).unwrap().replace("\n", "");
 
             let cap = match self.matcher.captures(&buffer) {
                 None => {continue}, //Si no matchea se ignora el pedido
                 Some(value) => value
             };
 
-            let request = Request::new(&cap[1],&cap[2], &cap[3], &cap[4] == "P")?;
+            let request = Request::new(&cap[1],&cap[2], &cap[3], &cap[4] == "P");
 
-            return Ok(Some(request))
+            if let Err(_) = self.admin.try_send(NewRequest(request)){
+                println!("Failing to send a new request to administrator");
+            }
+
+            if let Err(_) = ctx.address().try_send(ReadNextLine){
+                println!("Failing to send a next line message to parser");
+            }
         }
     }
 }
