@@ -1,4 +1,5 @@
 use std::error::Error;
+use std::thread;
 mod model;
 use model::parser::Parser;
 use model::error::{AppResult, InternalError};
@@ -6,15 +7,23 @@ use model::request_handler::RequestHandler;
 use model::web_service_provider::WebServiceProvider;
 use model::statistics::Statistics;
 use model::env;
+use model::log_handler::LogHandler;
 
-fn process_requests(csv_path: &str, json_path: &str) -> AppResult<()>{
+fn process_requests(csv_path: &str, json_path: &str, log_path : &str) -> AppResult<()>{
 
-    let envs = env::get_envs(json_path);
-    let mut parser = Parser::open(std::path::Path::new(csv_path))?;
+    let mut log = LogHandler::new(log_path);
+    let envs = env::get_envs(json_path, log.get_transmitter() );
+    let mut parser = Parser::open(std::path::Path::new(csv_path), log.get_transmitter() )?;
     let mut handlers: Vec<RequestHandler> = Vec::new();
     let mut web_provider = WebServiceProvider::new(envs.airline_limit, envs.hotel_limit);
     let mut statistics = Statistics::new();
 
+    
+    //esconder esto dentro del handler.
+    thread::spawn(move|| {
+        log.print_received(); 
+    });
+    
     loop {
         match parser.parse_request()? {
             None => break,  //Finalizamos
@@ -22,7 +31,10 @@ fn process_requests(csv_path: &str, json_path: &str) -> AppResult<()>{
                 //Levantar thread
                 match RequestHandler::spawn(request, &mut web_provider, &envs) {
                     Ok(handler) => handlers.push(handler),
-                    Err(error) => println!("{:?}", error) //Esto deberia ser un llamado a Logger.log_error
+                    Err(error) => {
+                        //tx.send(t);
+                        println!("{:?}", error); //Esto deberia ser un llamado a Logger.log_error
+                    }
                 };
             }
         }
@@ -54,6 +66,7 @@ fn clean_finished(handlers: &mut Vec<RequestHandler>, statistics: &mut Statistic
 
 
 fn main() -> Result<(), Box<dyn Error>> {
+
     let csv_path = match std::env::args().nth(1) {
         Some(r) => r,
         None => return Err(Box::new(InternalError::new("Usage: cargo run <path-to-input-file>")))
@@ -64,5 +77,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         None => String::from("files/env.json")
     };
 
-    process_requests(&csv_path[..], &json_path[..])
+    let log_path = match std::env::args().nth(3) {
+        Some(r) =>r,
+        None => String::from("files/log_file.txt")
+    };
+
+    process_requests(&csv_path[..], &json_path[..], &log_path[..])
 }

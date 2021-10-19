@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
+use super::logger::Logger;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -18,7 +19,7 @@ pub struct Configuration {
 
 impl Configuration {
     fn new() -> Self { 
-        Self { 
+        Self {
             airline_limit: 10, 
             air_failure_probability: 0.1, 
             air_min_work_time: 1000,
@@ -28,17 +29,23 @@ impl Configuration {
             hotel_min_work_time: 1000, 
             hotel_max_work_time: 4000, 
             sleeping_retry_time: 1000 
-        } 
+        }
     }
 }
 
-pub fn get_envs<P: AsRef<Path>>(path: P) -> Configuration {
+pub fn get_envs<P: AsRef<Path>>(path: P, logger : Logger) -> Configuration {
     let file = File::open(path).unwrap();
     let reader = BufReader::new(file);
 
     let config: Configuration = match serde_json::from_reader(reader) {
-        Ok(r) => r,
-        Err(_) => Configuration::new()
+        Ok(r) => {
+            logger.log_info("Config file successfully loaded");       
+            r
+        },
+        Err(_) => {
+            logger.log_warning("Unable to load config file, using default values");
+            Configuration::new()
+        } 
     };
 
     config

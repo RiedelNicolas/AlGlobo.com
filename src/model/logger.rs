@@ -1,40 +1,33 @@
-use super::message;
-use std::io::Write;
-use std::fs::File;
-use std::fs;
+use std::sync::mpsc::Sender;
+use super::message::Message;
 
-
+#[derive(Debug)]
+#[derive(Clone)]
 pub struct Logger {
-    rx: std::sync::mpsc::Receiver<message::Message>,
-    tx: std::sync::mpsc::Sender<message::Message>,
-    log_file:File
+    tx: Sender<Message> 
 }
 
 impl Logger {
-    pub fn new() -> Logger {
-        let (sender, receiver) = std::sync::mpsc::channel::<message::Message>();
+    
+    pub fn new (in_tx : &Sender<Message>) ->Logger {
         Logger {
-            rx: receiver,
-            tx: sender,
-            log_file : fs::OpenOptions::new()
-                .write(true)
-                .append(true)
-                .create(true)
-                .open("files/log_file.txt")
-                .unwrap()
+            tx:in_tx.clone()
         }
     }
-    pub fn print_received(&mut self) {
-        let received = self.rx.recv().unwrap();
-        println!("{}", received.generate_string() );
-        let r = write!(self.log_file, "{}\n", &received.generate_string() );
-        match r {
-            Ok(v) => v,
-            Err(e) => println!("Error found trying to write the logfile : {}",e)
-        }
+
+
+    // For con x intentos.
+
+    pub fn log_error ( &self, text: &str) {
+        let _ = self.tx.send(Message::new_error(text.to_string()));
     }
-    // returns an instances of a channel sender.
-    pub fn get_transmitter(&self) -> std::sync::mpsc::Sender<message::Message> {
-        self.tx.clone()
+
+    pub fn log_warning (&self, text: &str) {
+        let _ = self.tx.send(Message::new_warning(text.to_string()));
     }
+
+    pub fn log_info (&self, text: &str) {
+        let _ = self.tx.send(Message::new_info(text.to_string() ));
+    }
+
 }

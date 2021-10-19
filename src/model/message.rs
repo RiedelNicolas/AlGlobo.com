@@ -1,6 +1,6 @@
 use super::message_type::MessageType;
 extern crate chrono;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local};
 
 pub struct Message {
     message_type : MessageType,
@@ -34,13 +34,13 @@ impl Message {
     pub fn generate_string (&self)->String {
     
         let aux : String;
-        let now: DateTime<Utc> = Utc::now();
+        let now: DateTime<Local> = Local::now();
 
         match self.message_type {
             MessageType::Info => aux = "INF".to_string(),
             MessageType::Error => aux = "ERR".to_string(),
             MessageType::Warning => aux = "WAR".to_string(),
         }
-        format!("{}-{}-{}", aux, now.format("%e %B %Y %T") ,self.text)
+        format!("{} - {} - {}", aux, now.format("%e %b %Y %T") ,self.text)
     }
 }
