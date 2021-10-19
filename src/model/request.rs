@@ -47,7 +47,7 @@ impl Request {
     }
 
     pub fn get_route(&self) -> String {
-        format!("{}->{}", self.origin, self.destiny).to_string()
+        format!("{}->{}", self.origin, self.destiny)
     }
     
     pub fn get_completion_time(&self) -> &Duration {

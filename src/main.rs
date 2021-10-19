@@ -9,7 +9,12 @@ use model::statistics::Statistics;
 use model::env;
 use model::log_handler::LogHandler;
 
+<<<<<<< HEAD
 fn process_requests(csv_path: &str, json_path: &str, log_path : &str) -> AppResult<()>{
+=======
+
+fn process_requests(csv_path: &str, json_path: &str) -> AppResult<()>{
+>>>>>>> 4d586075e83659bebfab1d13c59ba8a8f5f582ef
 
     let mut log = LogHandler::new(log_path);
     let envs = env::get_envs(json_path, log.get_transmitter() );
