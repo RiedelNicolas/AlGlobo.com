@@ -17,12 +17,8 @@ pub struct RequestHandler {
 }
 
 impl RequestHandler {
-<<<<<<< HEAD
-    pub fn spawn(req: Request, provider: &mut WebServiceProvider, envs: &Configuration,
+    pub fn spawn(req: Request, provider: &mut WebServiceProvider, _envs: &Configuration,
                                                                         in_logger : Logger) -> AppResult<Self> {
-=======
-    pub fn spawn(req: Request, provider: &mut WebServiceProvider, _envs: &Configuration) -> AppResult<Self> {
->>>>>>> 4d586075e83659bebfab1d13c59ba8a8f5f582ef
         let connection = provider.airline_request(req.get_airline());
         let is_package = req.is_package();
         let protected_request_local = Arc::new(RwLock::new(req));
@@ -49,16 +45,11 @@ impl RequestHandler {
     fn process_request(request: Arc<RwLock<Request>>, connection: WebServiceConnection, logger : Logger) {
         logger.log_info(String::from("Trying to connect to extern web-service"));
         loop {
-<<<<<<< HEAD
-            if let Ok(_) = connection.resolve_request() {
+            if connection.resolve_request().is_ok() {
                 break;
             }
             logger.log_warning(String::from("Error trying to resolve request. Retrying in a moment..."));
             
-=======
-            if connection.resolve_request().is_ok() { break; }
-            println!("Error trying to resolve request. Retrying in a moment...");
->>>>>>> 4d586075e83659bebfab1d13c59ba8a8f5f582ef
             thread::sleep(time::Duration::from_millis(1000));   //Deberia ser cargado desde un ENV
         }
         match request.write() {

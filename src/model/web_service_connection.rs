@@ -15,7 +15,6 @@ pub struct WebServiceConnection {
 
 impl WebServiceConnection {
     
-<<<<<<< HEAD
     pub fn new(permission: Arc<Semaphore>, work_time_range: Range<u64>, failure_probability: f32, in_logger : Logger) -> Self {
         let connection = WebServiceConnection {
             permission,
@@ -25,14 +24,6 @@ impl WebServiceConnection {
         };
 
         connection
-=======
-    pub fn new(permission: Arc<Semaphore>, work_time_range: Range<u64>, failure_probability: f32) -> Self {
-        WebServiceConnection {
-            permission,
-            work_time_range,
-            failure_probability,
-        }
->>>>>>> 4d586075e83659bebfab1d13c59ba8a8f5f582ef
     }
 
     pub fn resolve_request(&self) -> AppResult<()> {

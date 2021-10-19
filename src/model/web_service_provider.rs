@@ -14,20 +14,14 @@ pub struct WebServiceProvider {
 impl WebServiceProvider {
     pub fn new(airline_limit: u32, hotel_limit: u32, in_logger : Logger) -> Self {
 
-        WebServiceProvider {
+        let web_service = WebServiceProvider {
             airlines: HashMap::new(),
             airline_limit,
-<<<<<<< HEAD
             hotels: Arc::new(Semaphore::new(hotel_limit as isize)),
             logger: in_logger.clone()
         };
-
         in_logger.log_info(String::from("Server Up") );
-        server
-=======
-            hotels: Arc::new(Semaphore::new(hotel_limit as isize))
-        }
->>>>>>> 4d586075e83659bebfab1d13c59ba8a8f5f582ef
+        web_service
     }
 
     pub fn airline_request(&mut self, airline_name: &str) -> WebServiceConnection {
