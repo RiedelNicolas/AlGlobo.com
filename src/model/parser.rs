@@ -24,7 +24,7 @@ impl Parser {
             matcher: Regex::new(r"^([A-Z]{3}),([A-Z]{3}),([A-z]+),([PV])$")?,
             logger : in_logger.clone()
         };
-        in_logger.log_info("CSV with requests successfully opened");
+        in_logger.log_info(String::from("CSV with requests successfully opened") );
         Ok(parser)
     }
 
@@ -43,15 +43,13 @@ impl Parser {
 
             let cap = match self.matcher.captures(&buffer) {
                 None => {
-                    self.logger.log_warning("Invalid line on Requests CSV, continuing anyway");
+                    self.logger.log_warning(String::from("Invalid line on Requests CSV, continuing anyway")  );
                     continue}, //Si no matchea se ignora el pedido
                 Some(value) =>{
-                    let aux = format!("Request read from '{}' to '{}' flying with '{}' requesting hotel '{}' ",
-                    &value[1], &value[2], &value[3], &value[4]=="P");
-                    self.logger.log_info(&aux[..]);
+                    self.logger.log_info(format!("Request read from '{}' to '{}' flying with '{}' requesting hotel '{}' ",
+                    &value[1], &value[2], &value[3], &value[4]=="P"));
                     value
                 }
-                 
             };
 
             let request = Request::new(&cap[1],&cap[2], &cap[3], &cap[4] == "P")?;

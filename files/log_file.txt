@@ -1,0 +1,11 @@
+INF - 19 Oct 2021 01:54:55 - Config file successfully loaded
+INF - 19 Oct 2021 01:54:55 - CSV with requests successfully opened
+INF - 19 Oct 2021 01:54:55 - Request read from 'EZE' to 'JFK' flying with 'AA' requesting hotel? 'true' 
+INF - 19 Oct 2021 01:54:55 - Request read from 'AEP' to 'LGA' flying with 'AA' requesting hotel? 'true' 
+INF - 19 Oct 2021 01:54:55 - Request read from 'AEP' to 'MIA' flying with 'LAN' requesting hotel? 'true' 
+INF - 19 Oct 2021 02:05:03 - Config file successfully loaded
+INF - 19 Oct 2021 02:05:03 - CSV with requests successfully opened
+INF - 19 Oct 2021 02:05:03 - Server Up
+INF - 19 Oct 2021 02:05:03 - Request read from 'EZE' to 'JFK' flying with 'AA' requesting hotel 'true' 
+INF - 19 Oct 2021 02:05:03 - Request read from 'AEP' to 'LGA' flying with 'AA' requesting hotel 'true' 
+INF - 19 Oct 2021 02:05:03 - Request read from 'AEP' to 'MIA' flying with 'LAN' requesting hotel 'true' 

@@ -14,10 +14,9 @@ fn process_requests(csv_path: &str, json_path: &str, log_path : &str) -> AppResu
     let mut log = LogHandler::new(log_path);
     let envs = env::get_envs(json_path, log.get_transmitter() );
     let mut parser = Parser::open(std::path::Path::new(csv_path), log.get_transmitter() )?;
-    let mut handlers: Vec<RequestHandler> = Vec::new();
-    let mut web_provider = WebServiceProvider::new(envs.airline_limit, envs.hotel_limit);
+    let mut web_provider = WebServiceProvider::new(envs.airline_limit, envs.hotel_limit, log.get_transmitter() );
     let mut statistics = Statistics::new();
-
+    let mut handlers: Vec<RequestHandler> = Vec::new();
     
     //esconder esto dentro del handler.
     thread::spawn(move|| {

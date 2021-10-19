@@ -18,16 +18,16 @@ impl Logger {
 
     // For con x intentos.
 
-    pub fn log_error ( &self, text: &str) {
-        let _ = self.tx.send(Message::new_error(text.to_string()));
+    pub fn log_error ( &self, text: String) {
+        let _ = self.tx.send(Message::new_error(text));
     }
 
-    pub fn log_warning (&self, text: &str) {
-        let _ = self.tx.send(Message::new_warning(text.to_string()));
+    pub fn log_warning (&self, text: String) {
+        let _ = self.tx.send(Message::new_warning(text));
     }
 
-    pub fn log_info (&self, text: &str) {
-        let _ = self.tx.send(Message::new_info(text.to_string() ));
+    pub fn log_info (&self, text: String) {
+        let _ = self.tx.send(Message::new_info(text ));
     }
 
 }
