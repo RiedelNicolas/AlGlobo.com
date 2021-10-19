@@ -15,7 +15,7 @@ pub struct Request {
 impl Request {
 
     pub fn new(origin: &str, destiny: &str, airline: &str, with_hotel: bool) -> Self {
-        let request = Request {
+        Request {
             id: Id::new(),
             origin: origin.to_string(),
             destiny: destiny.to_string(),
@@ -23,20 +23,18 @@ impl Request {
             with_hotel,
             arrival_time: Instant::now(),
             completion_time: Duration::from_secs(0)
-        };
-
-        request
+        }
     }
 
     pub fn get_id(&self) -> usize {
         self.id.get()
     }
 
-    pub fn finish(&mut self) {
+    pub fn _finish(&mut self) {
         self.completion_time = self.arrival_time.elapsed();
     }
 
-    pub fn get_completion_time(&self) -> &Duration {
+    pub fn _get_completion_time(&self) -> &Duration {
         &self.completion_time
     }
 }

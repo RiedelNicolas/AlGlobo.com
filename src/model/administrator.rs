@@ -41,11 +41,11 @@ impl Handler<NewRequest> for Administrator {
         
         let addr = self.airlines
             .entry(request.airline.clone())
-            .or_insert(Airline::new(&request.airline, ctx.address()).start());
+            .or_insert_with(|| Airline::new(&request.airline, ctx.address()).start());
         
         self.pending_requests.insert(id, (request, stages));
 
-        if let Err(_) = addr.try_send(AirlineRequest(id)){
+        if addr.try_send(AirlineRequest(id)).is_err(){
             print!("Failing to send [{}] request to airline web service", id);
         }
     }
@@ -54,13 +54,13 @@ impl Handler<NewRequest> for Administrator {
 impl Handler<FinishedWebServiceRequest> for Administrator {
     type Result = ();
 
-    fn handle(&mut self, msg: FinishedWebServiceRequest, ctx: &mut Context<Self>) -> Self::Result {
+    fn handle(&mut self, msg: FinishedWebServiceRequest, _ctx: &mut Context<Self>) -> Self::Result {
         let id = msg.0;
         if let Some((_, stages_left)) = self.pending_requests.get_mut(&id){
             *stages_left -= 1;
             if *stages_left == 0 {
                 if let Some((req, _)) = self.pending_requests.remove(&id){
-                    println!("Ha finalizado la request [{}-->{}] por {}", req.origin, req.destiny, req.airline);
+                    println!("Request [{}]: Finalizada request [{}->{}] por {}", req.get_id(), req.origin, req.destiny, req.airline);
                     println!("El hash de requests queda con {} conexiones", self.pending_requests.len());
                 }
             }

@@ -42,7 +42,7 @@ impl Actor for Parser {
 impl Handler<ReadNextLine> for Parser {
     type Result = ();
 
-    fn handle(&mut self, msg: ReadNextLine, ctx: &mut Context<Self>) -> Self::Result {
+    fn handle(&mut self, _msg: ReadNextLine, ctx: &mut Context<Self>) -> Self::Result {
 
         loop {
             let mut buffer = vec![];
@@ -62,11 +62,11 @@ impl Handler<ReadNextLine> for Parser {
 
             let request = Request::new(&cap[1],&cap[2], &cap[3], &cap[4] == "P");
 
-            if let Err(_) = self.admin.try_send(NewRequest(request)){
+            if self.admin.try_send(NewRequest(request)).is_err(){
                 println!("Failing to send a new request to administrator");
             }
 
-            if let Err(_) = ctx.address().try_send(ReadNextLine){
+            if ctx.address().try_send(ReadNextLine).is_err(){
                 println!("Failing to send a next line message to parser");
             }
         }

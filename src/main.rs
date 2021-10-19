@@ -1,9 +1,8 @@
 use std::error::Error;
 use actix::{System, Actor};
 mod model;
-use model::error::{AppResult, InternalError};
-use model::administrator::{Administrator, NewRequest};
-use model::request::Request;
+use model::error::{InternalError};
+use model::administrator::{Administrator};
 use model::parser::{Parser, ReadNextLine};
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -20,7 +19,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             .do_send(ReadNextLine);
     });
 
-    if let Err(_) = system.run() {
+    if system.run().is_err() {
         return Err(Box::new(InternalError::new("System error")))    //RRAAAAROOO
     };
 

@@ -1,39 +1,59 @@
 use actix::prelude::*;
+use crate::model::airline_connection::{AirlineConnection, Request};
 use super::administrator::{Administrator, FinishedWebServiceRequest};
-use rand::{thread_rng, Rng};
-use actix::clock::sleep;
-use std::time::Duration;
 
 #[derive(Message)]
 #[rtype(result = "")]
 pub struct AirlineRequest(pub usize);
 
+
+#[derive(Message)]
+#[rtype(result = "")]
+pub struct WaitAndProcessRequest;
+
+#[derive(Message)]
+#[rtype(result = "")]
+pub struct ConnectionFinished(pub usize);
+
 pub struct Airline {
     name: String,
-    conections: Vec<usize>,
+    connections: Vec<Addr<AirlineConnection>>,
     next_connection: usize,
+    max_concurrent_connections: usize,
     admin: Addr<Administrator>
 }
 
 impl Airline {
     
     pub fn new(name: &str, admin: Addr<Administrator>) -> Airline {
+
         Airline {
-            conections: vec!(),
-            next_connection: 0,
             name: name.to_string(),
+            connections: Vec::new(),
+            next_connection: 0,
+            max_concurrent_connections: 2,
             admin
         }
     }
     
-    pub fn calculate_next_connection(&mut self) -> usize{
-        if self.next_connection >= self.conections.len() {
+    pub fn get_next_connection(&mut self, airline_address: Addr<Airline>) -> Addr<AirlineConnection> {
+        
+        let connection = match self.connections.get_mut(self.next_connection){
+            Some(conn) => conn.clone(),
+            None => {
+                let conn = AirlineConnection::new(airline_address).start();
+                self.connections.push(conn.clone());
+                conn
+            }
+        };
+
+        if self.next_connection+1 >= self.max_concurrent_connections {
             self.next_connection = 0;
         } else {
             self.next_connection += 1;
         }
 
-        self.next_connection
+        connection
     }
 
 }
@@ -43,32 +63,29 @@ impl Actor for Airline {
 }
 
 impl Handler<AirlineRequest> for Airline {
-    type Result = ResponseActFuture<Self, ()>;
+    type Result = ();
 
     fn handle(&mut self, msg: AirlineRequest, ctx: &mut Context<Self>) -> Self::Result {
-        /*
-        Pasos:
-    
-        - Enviar la request a alguna de las conexiones, puede ser en round robin
-    
-        */
-        let id = msg.0;
-        println!("Request [{}]: Conectando con la aerolinea {}", id, self.name);
+        
+        let req_id = msg.0;
 
-        /*
-        Lo que viene a continuacion es simplemente una prueba, este actor no debe dormir.
-        */
+        println!("Request [{}]: Conectando con la aerolinea {}", self.name, req_id);
 
-        Box::pin(sleep(Duration::from_millis(thread_rng().gen_range(1000..2000)))
-            .into_actor(self)
-            .map(move |_result, me, _ctx| {
-                println!("Request [{}]: Request a la aerolinea resuelta", id);
-                
-                if let Err(_) = me.admin.try_send(FinishedWebServiceRequest(id)){
-                    println!("Failing to send [{}] completed request to adminstrator", id);
-                }
-            }))
-        //Algo asi deberia hacerse
-        //connections[self.calculate_next_connection()].send(...)
+        let addr = self.get_next_connection(ctx.address());
+
+        if addr.try_send(Request(req_id)).is_err(){
+            println!("Failing to process request");
+        }
+    }
+}
+
+
+impl Handler<ConnectionFinished> for Airline {
+    type Result = ();
+
+    fn handle(&mut self, msg: ConnectionFinished, _ctx: &mut Context<Self>) -> Self::Result {
+        if self.admin.try_send(FinishedWebServiceRequest(msg.0)).is_err(){
+            println!("Failing to process request");
+        }
     }
 }
