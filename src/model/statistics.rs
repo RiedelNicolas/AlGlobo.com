@@ -1,5 +1,7 @@
 use std::collections::HashMap;
+use std::f32::consts::LOG10_2;
 use std::time::Duration;
+use super::logger::Logger;
 
 #[derive(Debug)]
 pub struct InfoRequest {
@@ -23,15 +25,17 @@ impl InfoRequest {
 pub struct Statistics {
   routes_requested: HashMap<String, u32>,
   total_time: Duration,
-  requests_amount: u64
+  requests_amount: u64,
+  logger : Logger
 }
 
 impl Statistics {
-    pub fn new() -> Self { 
+    pub fn new( in_logger : Logger) -> Self { 
         Self { 
             routes_requested: HashMap::new(),
             total_time: Duration::from_secs(0),
-            requests_amount: 0
+            requests_amount: 0,
+            logger : in_logger.clone()
         }
     }
 
@@ -46,6 +50,8 @@ impl Statistics {
     }
 
     pub fn log_data(&self) {
-        println!("Tiempo: {}", self.total_time.as_secs() / self.requests_amount);
+        
+        self.logger.log_info(format!("Total Time: {}", (self.total_time.as_secs() / self.requests_amount) ));
+    
     }
 }

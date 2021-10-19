@@ -7,43 +7,49 @@ use super::statistics::InfoRequest;
 use std::thread::{self, JoinHandle};
 use std::time::{self, Duration};
 use std::sync::{Arc, RwLock};
+use super::logger::Logger;
 
 pub struct RequestHandler {
     request: Arc<RwLock<Request>>,
     airline: Option<JoinHandle<()>>,
-    hotel: Option<JoinHandle<()>>
+    hotel: Option<JoinHandle<()>>,
+    logger : Logger
 }
 
 impl RequestHandler {
-    pub fn spawn(req: Request, provider: &mut WebServiceProvider, envs: &Configuration) -> AppResult<Self> {
+    pub fn spawn(req: Request, provider: &mut WebServiceProvider, envs: &Configuration,
+                                                                        in_logger : Logger) -> AppResult<Self> {
         let connection = provider.airline_request(req.get_airline());
         let is_package = req.is_package();
         let protected_request_local = Arc::new(RwLock::new(req));
         let protected_request_airline = protected_request_local.clone();
         let protected_request_hotel = protected_request_local.clone();
-
+        let logger_clone = in_logger.clone();
         let handler = RequestHandler {
             request: protected_request_local,
-            airline: Some(thread::spawn( move || RequestHandler::process_request(protected_request_airline, connection))),
+            airline: Some(thread::spawn( move || RequestHandler::process_request(protected_request_airline, connection, logger_clone ))),
             hotel: match is_package {
                 true => {
                     let connection = provider.hotel_request();
-                    Some(thread::spawn( move || RequestHandler::process_request(protected_request_hotel, connection)))
+                    let aux = in_logger.clone();
+                    Some(thread::spawn( move || RequestHandler::process_request(protected_request_hotel, connection,  aux)))
                 },
                 false => None
-            }
+            },
+            logger : in_logger.clone()
         };
 
         Ok(handler)
     }
 
-    fn process_request(request: Arc<RwLock<Request>>, connection: WebServiceConnection) {
-        println!("Trying to connect to extern web-service");
+    fn process_request(request: Arc<RwLock<Request>>, connection: WebServiceConnection, logger : Logger) {
+        logger.log_info(String::from("Trying to connect to extern web-service"));
         loop {
             if let Ok(_) = connection.resolve_request() {
                 break;
             }
-            println!("Error trying to resolve request. Retrying in a moment...");
+            logger.log_warning(String::from("Error trying to resolve request. Retrying in a moment..."));
+            
             thread::sleep(time::Duration::from_millis(1000));   //Deberia ser cargado desde un ENV
         }
         match request.write() {
@@ -51,7 +57,8 @@ impl RequestHandler {
                 req.finish();
             },
             Err(_) => {
-                println!("Fatal error: Poisoned Lock"); //No me gusta mucho esto
+                logger.log_error(String::from("Fatal error: Poisoned Lock"));
+                //println!("Fatal error: Poisoned Lock"); //No me gusta mucho esto
             }
         }
     }
@@ -60,7 +67,8 @@ impl RequestHandler {
         match self.request.read() {
             Ok(req) => req.has_finished(),
             Err(_) => {
-                println!("Fatal error: Poisoned Lock"); //No me gusta mucho esto
+                self.logger.log_error(String::from("Fatal error: Poisoned Lock") );
+                //println!("Fatal error: Poisoned Lock"); //No me gusta mucho esto
                 false
             }
         }
@@ -74,6 +82,7 @@ impl RequestHandler {
                 InfoRequest::new(req.get_route(), *req.get_completion_time())
             },
             Err(_) => {
+                self.logger.log_error(String::from("Fatal error: Poisoned Lock"));
                 println!("Fatal error: Poisoned Lock"); //No me gusta mucho esto
                 InfoRequest::new(String::new(), Duration::from_secs(0)) // CAMBIAR ESTO
             }

@@ -15,24 +15,28 @@ fn process_requests(csv_path: &str, json_path: &str, log_path : &str) -> AppResu
     let envs = env::get_envs(json_path, log.get_transmitter() );
     let mut parser = Parser::open(std::path::Path::new(csv_path), log.get_transmitter() )?;
     let mut web_provider = WebServiceProvider::new(envs.airline_limit, envs.hotel_limit, log.get_transmitter() );
-    let mut statistics = Statistics::new();
+    let mut statistics = Statistics::new( log.get_transmitter() );
     let mut handlers: Vec<RequestHandler> = Vec::new();
+
+    
+    let logger = log.get_transmitter();
     
     //esconder esto dentro del handler.
     thread::spawn(move|| {
         log.print_received(); 
     });
     
+
     loop {
         match parser.parse_request()? {
             None => break,  //Finalizamos
             Some(request) => {
                 //Levantar thread
-                match RequestHandler::spawn(request, &mut web_provider, &envs) {
+                match RequestHandler::spawn(request, &mut web_provider, &envs,
+                                                             logger.clone() ) {
                     Ok(handler) => handlers.push(handler),
                     Err(error) => {
-                        //tx.send(t);
-                        println!("{:?}", error); //Esto deberia ser un llamado a Logger.log_error
+                        logger.log_error(format!("{:?}",error));
                     }
                 };
             }
