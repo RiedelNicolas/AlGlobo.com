@@ -12,13 +12,11 @@ pub struct WebServiceProvider {
 impl WebServiceProvider {
     pub fn new(airline_limit: u32, hotel_limit: u32) -> Self {
 
-        let server = WebServiceProvider {
+        WebServiceProvider {
             airlines: HashMap::new(),
             airline_limit,
             hotels: Arc::new(Semaphore::new(hotel_limit as isize))
-        };
-
-        server
+        }
     }
 
     pub fn airline_request(&mut self, airline_name: &str) -> WebServiceConnection {

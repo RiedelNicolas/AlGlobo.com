@@ -7,6 +7,7 @@ use model::web_service_provider::WebServiceProvider;
 use model::statistics::Statistics;
 use model::env;
 
+
 fn process_requests(csv_path: &str, json_path: &str) -> AppResult<()>{
 
     let envs = env::get_envs(json_path);

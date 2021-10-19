@@ -14,13 +14,11 @@ pub struct WebServiceConnection {
 impl WebServiceConnection {
     
     pub fn new(permission: Arc<Semaphore>, work_time_range: Range<u64>, failure_probability: f32) -> Self {
-        let connection = WebServiceConnection {
+        WebServiceConnection {
             permission,
             work_time_range,
             failure_probability,
-        };
-
-        connection
+        }
     }
 
     pub fn resolve_request(&self) -> AppResult<()> {

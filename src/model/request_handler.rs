@@ -15,7 +15,7 @@ pub struct RequestHandler {
 }
 
 impl RequestHandler {
-    pub fn spawn(req: Request, provider: &mut WebServiceProvider, envs: &Configuration) -> AppResult<Self> {
+    pub fn spawn(req: Request, provider: &mut WebServiceProvider, _envs: &Configuration) -> AppResult<Self> {
         let connection = provider.airline_request(req.get_airline());
         let is_package = req.is_package();
         let protected_request_local = Arc::new(RwLock::new(req));
@@ -40,9 +40,7 @@ impl RequestHandler {
     fn process_request(request: Arc<RwLock<Request>>, connection: WebServiceConnection) {
         println!("Trying to connect to extern web-service");
         loop {
-            if let Ok(_) = connection.resolve_request() {
-                break;
-            }
+            if connection.resolve_request().is_ok() { break; }
             println!("Error trying to resolve request. Retrying in a moment...");
             thread::sleep(time::Duration::from_millis(1000));   //Deberia ser cargado desde un ENV
         }
