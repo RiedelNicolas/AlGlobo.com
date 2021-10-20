@@ -17,7 +17,7 @@ pub struct RequestHandler {
 }
 
 impl RequestHandler {
-    pub fn spawn(req: Request, provider: &mut WebServiceProvider, _envs: &Configuration,
+    pub fn spawn(req: Request, provider: &mut WebServiceProvider, envs: Configuration,
                                                                         in_logger : Logger) -> AppResult<Self> {
         let connection = provider.airline_request(req.get_airline());
         let is_package = req.is_package();
@@ -27,12 +27,12 @@ impl RequestHandler {
         let logger_clone = in_logger.clone();
         let handler = RequestHandler {
             request: protected_request_local,
-            airline: Some(thread::spawn( move || RequestHandler::process_request(protected_request_airline, connection, logger_clone ))),
+            airline: Some(thread::spawn( move || RequestHandler::process_request(protected_request_airline, connection, envs, logger_clone ))),
             hotel: match is_package {
                 true => {
                     let connection = provider.hotel_request();
                     let aux = in_logger.clone();
-                    Some(thread::spawn( move || RequestHandler::process_request(protected_request_hotel, connection,  aux)))
+                    Some(thread::spawn( move || RequestHandler::process_request(protected_request_hotel, connection, envs, aux)))
                 },
                 false => None
             },
@@ -42,7 +42,7 @@ impl RequestHandler {
         Ok(handler)
     }
 
-    fn process_request(request: Arc<RwLock<Request>>, connection: WebServiceConnection, logger : Logger) {
+    fn process_request(request: Arc<RwLock<Request>>, connection: WebServiceConnection, envs: Configuration, logger : Logger) {
         logger.log_info(String::from("Trying to connect to extern web-service"));
         loop {
             if connection.resolve_request().is_ok() {
@@ -50,7 +50,7 @@ impl RequestHandler {
             }
             logger.log_warning(String::from("Error trying to resolve request. Retrying in a moment..."));
             
-            thread::sleep(time::Duration::from_millis(1000));   //Deberia ser cargado desde un ENV
+            thread::sleep(time::Duration::from_millis(envs.sleeping_retry_time));   //Deberia ser cargado desde un ENV
         }
         match request.write() {
             Ok(mut req) => {

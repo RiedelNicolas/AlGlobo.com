@@ -33,7 +33,7 @@ fn process_requests(csv_path: &str, json_path: &str, log_path : &str) -> AppResu
             None => break,  //Finalizamos
             Some(request) => {
                 //Levantar thread
-                match RequestHandler::spawn(request, &mut web_provider, &envs,
+                match RequestHandler::spawn(request, &mut web_provider, envs,
                                                              logger.clone() ) {
                     Ok(handler) => handlers.push(handler),
                     Err(error) => {

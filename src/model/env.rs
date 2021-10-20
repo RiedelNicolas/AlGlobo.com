@@ -4,7 +4,7 @@ use std::path::Path;
 use super::logger::Logger;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
 pub struct Configuration {
     pub airline_limit: u32,
     pub air_failure_probability: f32,
