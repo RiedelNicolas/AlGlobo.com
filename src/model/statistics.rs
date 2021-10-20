@@ -50,7 +50,7 @@ impl Statistics {
     }
 
     pub fn log_data(&self) {
-        
+        // IMPORTANTE CAMBIAR FALTA LOGGEAR LAS RUTAS MAS SOLICITADAS
         self.logger.log_info(format!("Total Time: {}", (self.total_time.as_secs() / self.requests_amount) ));
     
     }
