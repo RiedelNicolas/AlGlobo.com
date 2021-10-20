@@ -8,12 +8,12 @@ use serde::{Deserialize, Serialize};
 pub struct Configuration {
     pub airline_limit: u32,
     pub air_failure_probability: f32,
-    pub air_min_work_time: u32,
-    pub air_max_work_time: u32,
+    pub air_min_work_time: u64,
+    pub air_max_work_time: u64,
     pub hotel_limit: u32,
     pub hotel_failure_probability: f32,
-    pub hotel_min_work_time: u32,
-    pub hotel_max_work_time: u32,
+    pub hotel_min_work_time: u64,
+    pub hotel_max_work_time: u64,
     pub sleeping_retry_time: u64
 }
 

@@ -30,7 +30,7 @@ impl LogHandler {
         loop {
             match self.rx.recv() {
                 Ok(r) => {
-                    match write!(self.log_file, "{}\n", r.generate_string() ) {
+                    match writeln!(self.log_file, "{}", r.generate_string() ) {
                         Ok(v) => v,
                         Err(e) => println!("Error found trying to write the logfile : {}", e)
                     }

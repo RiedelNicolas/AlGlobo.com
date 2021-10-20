@@ -19,7 +19,7 @@ pub struct RequestHandler {
 impl RequestHandler {
     pub fn spawn(req: Request, provider: &mut WebServiceProvider, envs: Configuration,
                                                                         in_logger : Logger) -> AppResult<Self> {
-        let connection = provider.airline_request(req.get_airline());
+        let connection = provider.airline_request(req.get_airline(), envs);
         let is_package = req.is_package();
         let protected_request_local = Arc::new(RwLock::new(req));
         let protected_request_airline = protected_request_local.clone();
@@ -30,7 +30,7 @@ impl RequestHandler {
             airline: Some(thread::spawn( move || RequestHandler::process_request(protected_request_airline, connection, envs, logger_clone ))),
             hotel: match is_package {
                 true => {
-                    let connection = provider.hotel_request();
+                    let connection = provider.hotel_request(envs);
                     let aux = in_logger.clone();
                     Some(thread::spawn( move || RequestHandler::process_request(protected_request_hotel, connection, envs, aux)))
                 },
@@ -50,7 +50,7 @@ impl RequestHandler {
             }
             logger.log_warning(String::from("Error trying to resolve request. Retrying in a moment..."));
             
-            thread::sleep(time::Duration::from_millis(envs.sleeping_retry_time));   //Deberia ser cargado desde un ENV
+            thread::sleep(time::Duration::from_millis(envs.sleeping_retry_time));
         }
         match request.write() {
             Ok(mut req) => {

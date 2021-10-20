@@ -1,73 +1,25 @@
-INF - 19 Oct 2021 01:54:55 - Config file successfully loaded
-INF - 19 Oct 2021 01:54:55 - CSV with requests successfully opened
-INF - 19 Oct 2021 01:54:55 - Request read from 'EZE' to 'JFK' flying with 'AA' requesting hotel? 'true' 
-INF - 19 Oct 2021 01:54:55 - Request read from 'AEP' to 'LGA' flying with 'AA' requesting hotel? 'true' 
-INF - 19 Oct 2021 01:54:55 - Request read from 'AEP' to 'MIA' flying with 'LAN' requesting hotel? 'true' 
-INF - 19 Oct 2021 02:05:03 - Config file successfully loaded
-INF - 19 Oct 2021 02:05:03 - CSV with requests successfully opened
-INF - 19 Oct 2021 02:05:03 - Server Up
-INF - 19 Oct 2021 02:05:03 - Request read from 'EZE' to 'JFK' flying with 'AA' requesting hotel 'true' 
-INF - 19 Oct 2021 02:05:03 - Request read from 'AEP' to 'LGA' flying with 'AA' requesting hotel 'true' 
-INF - 19 Oct 2021 02:05:03 - Request read from 'AEP' to 'MIA' flying with 'LAN' requesting hotel 'true' 
-INF - 19 Oct 2021 11:02:40 - Config file successfully loaded
-INF - 19 Oct 2021 11:02:40 - CSV with requests successfully opened
-INF - 19 Oct 2021 11:02:40 - Server Up
-INF - 19 Oct 2021 11:02:40 - Request read from 'EZE' to 'JFK' flying with 'AA' requesting hotel 'true' 
-INF - 19 Oct 2021 11:02:40 - Sending request to the airline AA
-INF - 19 Oct 2021 11:02:40 - Sending request to the hotel (julian ayuda salvame)
-INF - 19 Oct 2021 11:02:40 - Trying to connect to extern web-service
-INF - 19 Oct 2021 11:02:40 - Trying to connect to extern web-service
-INF - 19 Oct 2021 11:02:40 - Request read from 'AEP' to 'LGA' flying with 'AA' requesting hotel 'true' 
-INF - 19 Oct 2021 11:02:40 - Sending request to the airline AA
-INF - 19 Oct 2021 11:02:40 - Sending request to the hotel (julian ayuda salvame)
-INF - 19 Oct 2021 11:02:40 - Trying to connect to extern web-service
-INF - 19 Oct 2021 11:02:40 - Request read from 'AEP' to 'MIA' flying with 'LAN' requesting hotel 'true' 
-INF - 19 Oct 2021 11:02:40 - Sending request to the airline LAN
-INF - 19 Oct 2021 11:02:40 - Sending request to the hotel (julian ayuda salvame)
-INF - 19 Oct 2021 11:02:40 - Trying to connect to extern web-service
-INF - 19 Oct 2021 11:02:40 - Trying to connect to extern web-service
-INF - 19 Oct 2021 11:02:40 - Trying to connect to extern web-service
-INF - 19 Oct 2021 11:02:42 - se acepto un request toquen algo aca xd
-INF - 19 Oct 2021 11:02:42 - se acepto un request toquen algo aca xd
-INF - 19 Oct 2021 11:02:42 - se acepto un request toquen algo aca xd
-ERR - 19 Oct 2021 11:02:42 - op could not be done
-WAR - 19 Oct 2021 11:02:42 - Error trying to resolve request. Retrying in a moment...
-ERR - 19 Oct 2021 11:02:43 - op could not be done
-WAR - 19 Oct 2021 11:02:43 - Error trying to resolve request. Retrying in a moment...
-INF - 19 Oct 2021 11:02:43 - se acepto un request toquen algo aca xd
-INF - 19 Oct 2021 11:02:45 - se acepto un request toquen algo aca xd
-ERR - 19 Oct 2021 11:02:46 - op could not be done
-WAR - 19 Oct 2021 11:02:46 - Error trying to resolve request. Retrying in a moment...
-INF - 19 Oct 2021 11:02:50 - se acepto un request toquen algo aca xd
-INF - 19 Oct 2021 11:02:50 - Total Time: 5
-INF - 19 Oct 2021 11:20:28 - Config file successfully loaded
-INF - 19 Oct 2021 11:20:28 - CSV with requests successfully opened
-INF - 19 Oct 2021 11:20:28 - Server Up
-INF - 19 Oct 2021 11:20:28 - Request read from 'EZE' to 'JFK' flying with 'AA' requesting hotel 'true' 
-INF - 19 Oct 2021 11:20:28 - Sending request to the airline AA
-INF - 19 Oct 2021 11:20:28 - Sending request to the hotel (julian ayuda salvame)
-INF - 19 Oct 2021 11:20:28 - Trying to connect to extern web-service
-INF - 19 Oct 2021 11:20:28 - Request read from 'AEP' to 'LGA' flying with 'AA' requesting hotel 'true' 
-INF - 19 Oct 2021 11:20:28 - Sending request to the airline AA
-INF - 19 Oct 2021 11:20:28 - Trying to connect to extern web-service
-INF - 19 Oct 2021 11:20:28 - Sending request to the hotel (julian ayuda salvame)
-INF - 19 Oct 2021 11:20:28 - Trying to connect to extern web-service
-INF - 19 Oct 2021 11:20:28 - Request read from 'AEP' to 'MIA' flying with 'LAN' requesting hotel 'true' 
-INF - 19 Oct 2021 11:20:28 - Sending request to the airline LAN
-INF - 19 Oct 2021 11:20:28 - Sending request to the hotel (julian ayuda salvame)
-INF - 19 Oct 2021 11:20:28 - Trying to connect to extern web-service
-INF - 19 Oct 2021 11:20:28 - Trying to connect to extern web-service
-INF - 19 Oct 2021 11:20:28 - Trying to connect to extern web-service
-INF - 19 Oct 2021 11:20:29 - se acepto un request toquen algo aca xd
-INF - 19 Oct 2021 11:20:30 - se acepto un request toquen algo aca xd
-INF - 19 Oct 2021 11:20:30 - se acepto un request toquen algo aca xd
-ERR - 19 Oct 2021 11:20:30 - op could not be done
-WAR - 19 Oct 2021 11:20:30 - Error trying to resolve request. Retrying in a moment...
-ERR - 19 Oct 2021 11:20:30 - op could not be done
-WAR - 19 Oct 2021 11:20:30 - Error trying to resolve request. Retrying in a moment...
-INF - 19 Oct 2021 11:20:31 - se acepto un request toquen algo aca xd
-ERR - 19 Oct 2021 11:20:33 - op could not be done
-WAR - 19 Oct 2021 11:20:33 - Error trying to resolve request. Retrying in a moment...
-INF - 19 Oct 2021 11:20:33 - se acepto un request toquen algo aca xd
-INF - 19 Oct 2021 11:20:38 - se acepto un request toquen algo aca xd
-INF - 19 Oct 2021 11:20:38 - Total Time: 6
+INF - 20 Oct 2021 17:15:31 - Config file successfully loaded
+INF - 20 Oct 2021 17:15:31 - CSV with requests successfully opened
+INF - 20 Oct 2021 17:15:31 - Server Up
+INF - 20 Oct 2021 17:15:31 - Request read from 'EZE' to 'JFK' flying with 'AA' requesting hotel 'true' 
+INF - 20 Oct 2021 17:15:31 - Sending request to the airline AA
+INF - 20 Oct 2021 17:15:31 - Sending request to the hotel (julian ayuda salvame)
+INF - 20 Oct 2021 17:15:31 - Request read from 'AEP' to 'LGA' flying with 'AA' requesting hotel 'true' 
+INF - 20 Oct 2021 17:15:31 - Sending request to the airline AA
+INF - 20 Oct 2021 17:15:31 - Trying to connect to extern web-service
+INF - 20 Oct 2021 17:15:31 - Sending request to the hotel (julian ayuda salvame)
+INF - 20 Oct 2021 17:15:31 - Trying to connect to extern web-service
+INF - 20 Oct 2021 17:15:31 - Request read from 'AEP' to 'MIA' flying with 'LAN' requesting hotel 'true' 
+INF - 20 Oct 2021 17:15:31 - Sending request to the airline LAN
+INF - 20 Oct 2021 17:15:31 - Trying to connect to extern web-service
+INF - 20 Oct 2021 17:15:31 - Sending request to the hotel (julian ayuda salvame)
+INF - 20 Oct 2021 17:15:31 - Trying to connect to extern web-service
+INF - 20 Oct 2021 17:15:31 - Trying to connect to extern web-service
+INF - 20 Oct 2021 17:15:31 - Trying to connect to extern web-service
+INF - 20 Oct 2021 17:15:32 - se acepto un request toquen algo aca xd
+INF - 20 Oct 2021 17:15:33 - se acepto un request toquen algo aca xd
+INF - 20 Oct 2021 17:15:34 - se acepto un request toquen algo aca xd
+INF - 20 Oct 2021 17:15:34 - se acepto un request toquen algo aca xd
+INF - 20 Oct 2021 17:15:34 - se acepto un request toquen algo aca xd
+INF - 20 Oct 2021 17:15:35 - se acepto un request toquen algo aca xd
+INF - 20 Oct 2021 17:15:35 - Total Time: 3

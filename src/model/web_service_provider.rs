@@ -1,6 +1,7 @@
 use std_semaphore::Semaphore;
 use std::sync::Arc;
 use std::collections::HashMap;
+use super::env::Configuration;
 use super::logger::Logger;
 use super::web_service_connection::WebServiceConnection;
 
@@ -24,7 +25,7 @@ impl WebServiceProvider {
         web_service
     }
 
-    pub fn airline_request(&mut self, airline_name: &str) -> WebServiceConnection {
+    pub fn airline_request(&mut self, airline_name: &str, envs: Configuration) -> WebServiceConnection {
 
         self.logger.log_info(format!("Sending request to the airline {}", airline_name));
         let semaphore = match self.airlines.get(airline_name) {
@@ -35,16 +36,14 @@ impl WebServiceProvider {
                 sema
             }
         };
-        //Esto deberia levantarse de un ENV
-        WebServiceConnection::new(semaphore, 1000..4000, 0.3,
+        WebServiceConnection::new(semaphore, envs.air_min_work_time..envs.air_max_work_time, envs.air_failure_probability,
              self.logger.clone() )
     }
 
 
-    pub fn hotel_request(&mut self) -> WebServiceConnection {
+    pub fn hotel_request(&mut self, envs: Configuration) -> WebServiceConnection {
         self.logger.log_info(format!("Sending request to the hotel (julian ayuda salvame)"));
-        //Esto deberia levantarse de un ENV
-        WebServiceConnection::new(self.hotels.clone(), 1000..2000, 0.0,
+        WebServiceConnection::new(self.hotels.clone(), envs.hotel_min_work_time..envs.hotel_max_work_time, envs.hotel_failure_probability,
         self.logger.clone())
     }
 }
