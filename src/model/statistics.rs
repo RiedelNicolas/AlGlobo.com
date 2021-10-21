@@ -50,8 +50,20 @@ impl Statistics {
     }
 
     pub fn log_data(&self) {
-        // IMPORTANTE CAMBIAR FALTA LOGGEAR LAS RUTAS MAS SOLICITADAS
-        self.logger.log_info(format!("Total Time: {}", (self.total_time.as_secs() / self.requests_amount) ));
-    
+        let mut top_requested: Vec<(&String, &u32)> = Vec::new();
+        for (key,value) in self.routes_requested.iter() {
+            top_requested.push((key, value));
+        }
+        top_requested.sort_by_key(|k| k.1);
+        
+        let mut top_req_str: String = String::new();
+        let index = if top_requested.len() > 5 { 5 } else { top_requested.len() };
+        for i in 0..index {
+            top_req_str.push_str(top_requested[i].0);
+            if i != index-1 { top_req_str.push_str(" // "); };
+        }
+
+        self.logger.log_info(format!("Average Request Time: {}", (self.total_time.as_secs() / self.requests_amount) ));
+        self.logger.log_info(format!("Top Requested Routes: {}", top_req_str ));
     }
 }
