@@ -4,6 +4,8 @@ mod model;
 use model::error::{InternalError};
 use model::administrator::{Administrator};
 use model::parser::{Parser, ReadNextLine};
+use model::logger::Logger;
+use model::logger_message::LoggerMessage;
 
 fn main() -> Result<(), Box<dyn Error>> {
 
@@ -14,6 +16,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let system = System::new();
     system.block_on(async {
         let addr = Administrator::new().start();
+        let addr_logger = Logger::new("files/log_file.txt").start();
+        addr_logger.do_send(LoggerMessage::new_info(String::from("Arrancamos caravana..")));
         Parser::open(csv_path, addr).unwrap()   //ESTO ESTA MAL, MUY MAL, PERO NO SE COMO ATAJAR EL ERROR
             .start()
             .do_send(ReadNextLine);
