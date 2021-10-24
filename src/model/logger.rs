@@ -4,7 +4,7 @@ use std::fs::File;
 use std::fs;
 use super::logger_message::LoggerMessage;
 
-struct Logger {
+pub struct Logger {
     log_file : File
 }
 
