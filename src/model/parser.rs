@@ -63,7 +63,7 @@ impl Handler<ReadNextLine> for Parser {
             let request = Request::new(&cap[1],&cap[2], &cap[3], &cap[4] == "P");
 
             if self.admin.try_send(NewRequest(request)).is_err(){
-                println!("Failing to send a new request to administrator");
+                println!("Parser: Failing to send a new request to administrator");
             }
 
             if ctx.address().try_send(ReadNextLine).is_err(){

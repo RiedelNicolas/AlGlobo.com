@@ -4,8 +4,8 @@ use actix::prelude::*;
 
 #[derive(Debug)]
 pub struct InfoRequest {
-    route: String,
-    time: Duration
+    pub route: String,
+    pub time: Duration
 }
 
 #[derive(Message)]
@@ -15,18 +15,6 @@ pub struct Update(pub InfoRequest);
 #[derive(Message)]
 #[rtype(result = "")]
 pub struct LogData;
-
-impl InfoRequest {
-    pub fn new(route: String, time: Duration) -> Self { Self { route, time } }
-
-    pub fn route(&self) -> String {
-        String::from(&self.route)
-    }
-
-    pub fn time(&self) -> &Duration {
-        &self.time
-    }
-}
 
 #[derive(Debug)]
 pub struct Statistics {
@@ -43,6 +31,16 @@ impl Statistics {
             requests_amount: 0
         }
     }
+
+    fn log(&self) {
+        println!("Estadisticas:  
+        - Tiempo medio de resolucion: {}
+        - Tiempo total: {},
+        - Total requests: {}", 
+        self.total_time.as_millis() as f64 / self.requests_amount as f64,
+        self.total_time.as_millis() as f64,
+        self.requests_amount); //CAMBIAR
+    }
 }
 
 impl Actor for Statistics {
@@ -54,20 +52,19 @@ impl Handler<Update> for Statistics {
 
     fn handle(&mut self, msg: Update, ctx: &mut Context<Self>) -> Self::Result {
         let req = msg.0;
-        let route = req.route();
-        let time = *req.time();
+        let route = req.route;
+        let time = req.time;
 
         self.requests_amount += 1;
         self.total_time += time;
         
         *self.routes_requested.entry(route).or_insert(0) += 1;
-    }
-}
 
-impl Handler<LogData> for Statistics {
-    type Result = ();
+        // TODO: Numeros magicos
 
-    fn handle(&mut self, msg: LogData, ctx: &mut Context<Self>) -> Self::Result {
-        println!("Tiempo: {}", self.total_time.as_secs() / self.requests_amount); //CAMBIAR
+        if self.requests_amount % 2 == 0 {
+            self.log();
+        }
+
     }
 }

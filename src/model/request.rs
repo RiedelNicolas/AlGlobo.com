@@ -30,11 +30,16 @@ impl Request {
         self.id.get()
     }
 
-    pub fn _finish(&mut self) {
+    pub fn finish(&mut self) {
         self.completion_time = self.arrival_time.elapsed();
     }
 
-    pub fn _get_completion_time(&self) -> &Duration {
+    pub fn get_completion_time(&self) -> &Duration {
         &self.completion_time
     }
+
+    pub fn get_route(&self) -> String {
+        format!("{}->{}", self.origin, self.destiny)
+    }
+
 }
