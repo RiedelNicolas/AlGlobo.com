@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::f32::consts::LOG10_2;
 use std::time::Duration;
 use super::logger::Logger;
 
@@ -26,7 +25,8 @@ pub struct Statistics {
   routes_requested: HashMap<String, u32>,
   total_time: Duration,
   requests_amount: u64,
-  logger : Logger
+  logger: Logger,
+  requests_finished: u32
 }
 
 impl Statistics {
@@ -35,11 +35,12 @@ impl Statistics {
             routes_requested: HashMap::new(),
             total_time: Duration::from_secs(0),
             requests_amount: 0,
-            logger : in_logger.clone()
+            logger : in_logger,
+            requests_finished: 0
         }
     }
 
-    pub fn update(&mut self, req: InfoRequest) { 
+    pub fn update(&mut self, req: InfoRequest) {
         let route = req.route();
         let time = *req.time();
 
@@ -47,6 +48,10 @@ impl Statistics {
         self.total_time += time;
         
         *self.routes_requested.entry(route).or_insert(0) += 1;
+
+        if self.requests_finished % 5 == 0 { // traer de env
+            self.log_data();
+        }
     }
 
     pub fn log_data(&self) {
@@ -57,13 +62,14 @@ impl Statistics {
         top_requested.sort_by_key(|k| k.1);
         
         let mut top_req_str: String = String::new();
-        let index = if top_requested.len() > 5 { 5 } else { top_requested.len() };
+        let index = if top_requested.len() > 5 { 5 } else { top_requested.len() }; // VER SI NO PONER EN ENV ESTO
+        
         for i in 0..index {
             top_req_str.push_str(top_requested[i].0);
             if i != index-1 { top_req_str.push_str(" // "); };
         }
 
-        self.logger.log_info(format!("Average Request Time: {}", (self.total_time.as_secs() / self.requests_amount) ));
-        self.logger.log_info(format!("Top Requested Routes: {}", top_req_str ));
+        self.logger.log_info(format!("[Statistics] Average Request Time: {}", (self.total_time.as_secs() / self.requests_amount) ));
+        self.logger.log_info(format!("[Statistics] Top Requested Routes: {}", top_req_str ));
     }
 }

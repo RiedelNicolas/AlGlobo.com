@@ -36,19 +36,26 @@ impl RequestHandler {
                 },
                 false => None
             },
-            logger : in_logger.clone()
+            logger : in_logger
         };
 
         Ok(handler)
     }
 
     fn process_request(request: Arc<RwLock<Request>>, connection: WebServiceConnection, envs: Configuration, logger : Logger) {
-        logger.log_info(String::from("Trying to connect to extern web-service"));
+        logger.log_info(String::from("[RequestHandler] Trying to connect to extern web-service"));
         loop {
+            match connection.resolve_request() {
+                Ok(_) => {
+                    logger.log_info(String::from("[RequestHandler] Request completed"));
+                },
+                Err(_) => {
+                    logger.log_warning(String::from("[RequestHandler] Request could not be done. Retrying in a moment"));
+                }
+            }
             if connection.resolve_request().is_ok() {
                 break;
             }
-            logger.log_warning(String::from("Error trying to resolve request. Retrying in a moment..."));
             
             thread::sleep(time::Duration::from_millis(envs.sleeping_retry_time));
         }

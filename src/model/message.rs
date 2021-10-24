@@ -31,6 +31,13 @@ impl Message {
         }
     }
 
+    pub fn close() -> Message {
+        Message {
+            text: String::from("__CloseChannelSignal__"),
+            message_type: MessageType::Close
+        }
+    }
+
     pub fn generate_string (&self)->String {
     
         let aux : String;
@@ -40,7 +47,13 @@ impl Message {
             MessageType::Info => aux = "INF".to_string(),
             MessageType::Error => aux = "ERR".to_string(),
             MessageType::Warning => aux = "WAR".to_string(),
+            MessageType::Close => aux = "".to_string(),
         }
         format!("{} - {} - {}", aux, now.format("%e %b %Y %T") ,self.text)
+    }
+
+    /// Get a reference to the message's message type.
+    pub fn message_type(&self) -> &MessageType {
+        &self.message_type
     }
 }

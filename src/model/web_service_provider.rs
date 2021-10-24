@@ -14,20 +14,17 @@ pub struct WebServiceProvider {
 
 impl WebServiceProvider {
     pub fn new(airline_limit: u32, hotel_limit: u32, in_logger : Logger) -> Self {
-
-        let web_service = WebServiceProvider {
+        WebServiceProvider {
             airlines: HashMap::new(),
             airline_limit,
             hotels: Arc::new(Semaphore::new(hotel_limit as isize)),
-            logger: in_logger.clone()
-        };
-        in_logger.log_info(String::from("Server Up") );
-        web_service
+            logger: in_logger
+        }
     }
 
     pub fn airline_request(&mut self, airline_name: &str, envs: Configuration) -> WebServiceConnection {
 
-        self.logger.log_info(format!("Sending request to the airline {}", airline_name));
+        self.logger.log_info(format!("[WebServiceProvider] Sending request to the airline {}", airline_name));
         let semaphore = match self.airlines.get(airline_name) {
             Some(sema) => sema.clone(),
             None => {
@@ -36,14 +33,12 @@ impl WebServiceProvider {
                 sema
             }
         };
-        WebServiceConnection::new(semaphore, envs.air_min_work_time..envs.air_max_work_time, envs.air_failure_probability,
-             self.logger.clone() )
+        WebServiceConnection::new(semaphore, envs.air_min_work_time..envs.air_max_work_time, envs.air_failure_probability )
     }
 
 
     pub fn hotel_request(&mut self, envs: Configuration) -> WebServiceConnection {
-        self.logger.log_info(format!("Sending request to the hotel (julian ayuda salvame)"));
-        WebServiceConnection::new(self.hotels.clone(), envs.hotel_min_work_time..envs.hotel_max_work_time, envs.hotel_failure_probability,
-        self.logger.clone())
+        self.logger.log_info("[WebServiceProvider] Sending request to the hotel".to_string()); //CHEQUEAR
+        WebServiceConnection::new(self.hotels.clone(), envs.hotel_min_work_time..envs.hotel_max_work_time, envs.hotel_failure_probability)
     }
 }

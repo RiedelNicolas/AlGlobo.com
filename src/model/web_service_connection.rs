@@ -1,5 +1,4 @@
 use super::error::{AppResult, InternalError};
-use super::logger::Logger;
 use std_semaphore::Semaphore;
 use std::ops::Range;
 use std::sync::Arc;
@@ -10,20 +9,16 @@ pub struct WebServiceConnection {
     permission: Arc<Semaphore>,
     work_time_range: Range<u64>,
     failure_probability: f32,
-    logger : Logger
 }
 
 impl WebServiceConnection {
     
-    pub fn new(permission: Arc<Semaphore>, work_time_range: Range<u64>, failure_probability: f32, in_logger : Logger) -> Self {
-        let connection = WebServiceConnection {
+    pub fn new(permission: Arc<Semaphore>, work_time_range: Range<u64>, failure_probability: f32) -> Self {
+        WebServiceConnection {
             permission,
             work_time_range,
             failure_probability,
-            logger : in_logger.clone()
-        };
-
-        connection
+        }
     }
 
     pub fn resolve_request(&self) -> AppResult<()> {
@@ -35,11 +30,9 @@ impl WebServiceConnection {
         self.permission.release();
 
         if ok {
-            self.logger.log_info(String::from("se acepto un request toquen algo aca xd"));
             Ok(()) 
         } else {
-            self.logger.log_error(String::from("op could not be done"));
-            Err(Box::new(InternalError::new("Operation couldn't be done, please retry"))) 
+            Err(Box::new(InternalError::new("Request could not be done"))) 
         }
     }
 }

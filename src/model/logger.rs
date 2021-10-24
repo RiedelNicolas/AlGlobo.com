@@ -30,4 +30,7 @@ impl Logger {
         let _ = self.tx.send(Message::new_info(text ));
     }
 
+    pub fn close (&self) {
+        let _ = self.tx.send(Message::close());
+    }
 }

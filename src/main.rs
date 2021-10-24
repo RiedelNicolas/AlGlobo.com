@@ -1,5 +1,4 @@
 use std::error::Error;
-use std::thread;
 mod model;
 use model::parser::Parser;
 use model::error::{AppResult, InternalError};
@@ -12,21 +11,16 @@ use model::log_handler::LogHandler;
 
 fn process_requests(csv_path: &str, json_path: &str, log_path : &str) -> AppResult<()>{
 
-    let mut log = LogHandler::new(log_path);
+    let log = LogHandler::new(log_path);
     let envs = env::get_envs(json_path, log.get_transmitter() );
     let mut parser = Parser::open(std::path::Path::new(csv_path), log.get_transmitter() )?;
     let mut web_provider = WebServiceProvider::new(envs.airline_limit, envs.hotel_limit, log.get_transmitter() );
     let mut statistics = Statistics::new( log.get_transmitter() );
     let mut handlers: Vec<RequestHandler> = Vec::new();
-
     
     let logger = log.get_transmitter();
     
-    //esconder esto dentro del handler.
-    thread::spawn(move|| {
-        log.print_received(); 
-    });
-    
+    logger.log_info(String::from("[Main] Server up") );
 
     loop {
         match parser.parse_request()? {
@@ -37,7 +31,7 @@ fn process_requests(csv_path: &str, json_path: &str, log_path : &str) -> AppResu
                                                              logger.clone() ) {
                     Ok(handler) => handlers.push(handler),
                     Err(error) => {
-                        logger.log_error(format!("{:?}",error));
+                        logger.log_error(format!("{:?}", error));
                     }
                 };
             }
@@ -50,7 +44,10 @@ fn process_requests(csv_path: &str, json_path: &str, log_path : &str) -> AppResu
         statistics.update(datos);
     }
 
-    statistics.log_data();
+    logger.log_info(String::from("[Main] Server down") );
+    logger.close();
+
+    log.join();
     Ok(())
 }
 
@@ -61,7 +58,6 @@ fn clean_finished(handlers: &mut Vec<RequestHandler>, statistics: &mut Statistic
             let req = handlers.remove(i);
             let datos = req.join();
             statistics.update(datos);
-            statistics.log_data();
         } else {
             i += 1;
         }

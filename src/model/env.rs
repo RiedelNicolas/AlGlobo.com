@@ -39,11 +39,11 @@ pub fn get_envs<P: AsRef<Path>>(path: P, logger : Logger) -> Configuration {
 
     let config: Configuration = match serde_json::from_reader(reader) {
         Ok(r) => {
-            logger.log_info(String::from("Config file successfully loaded"));       
+            logger.log_info(String::from("[Configuration] Config file successfully loaded"));       
             r
         },
         Err(_) => {
-            logger.log_warning(String::from("Unable to load config file, using default values"));
+            logger.log_warning(String::from("[Configuration] Unable to load config file, using default values"));
             Configuration::new()
         } 
     };
