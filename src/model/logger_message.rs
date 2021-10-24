@@ -14,21 +14,21 @@ impl LoggerMessage {
 
     //creo los 3 constructores 
     pub fn new_error(in_text:String) -> LoggerMessage {
-        Message {
+        LoggerMessage {
             text: in_text,
             message_type: MessageType::Error
         }
     }
 
     pub fn new_info(in_text:String) -> LoggerMessage {
-        Message {
+        LoggerMessage {
             text: in_text,
             message_type: MessageType::Info
         }
     }
 
     pub fn new_warning(in_text:String) -> LoggerMessage {
-        Message {
+        LoggerMessage {
             text: in_text,
             message_type: MessageType::Warning
         }

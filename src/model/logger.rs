@@ -2,7 +2,7 @@ use actix::prelude::*;
 use std::io::Write;
 use std::fs::File;
 use std::fs;
-use super::logger_message::Message;
+use super::logger_message::LoggerMessage;
 
 struct Logger {
     log_file : File
@@ -15,7 +15,6 @@ impl Actor for Logger {
 // Constructor del logger, 
 impl Logger {
     pub fn new( path : &str ) -> Logger {
-        let (sender, receiver) = std::sync::mpsc::channel::<message::Message>();
         Logger {
             log_file : fs::OpenOptions::new()
                 .write(true)
@@ -28,7 +27,7 @@ impl Logger {
 }
 
 
-impl Handler<Message> for Logger {
+impl Handler<LoggerMessage> for Logger {
 
     type Result = ();
 
