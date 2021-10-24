@@ -19,7 +19,7 @@ impl LogHandler {
                                             .append(true)
                                             .create(true)
                                             .open(path)
-                                            .unwrap();
+                                            .expect("No se pudo abrir el log_file");
         
         LogHandler {
             tx: sender,
