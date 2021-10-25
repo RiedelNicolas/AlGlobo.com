@@ -44,6 +44,7 @@ fn process_requests(csv_path: &str, json_path: &str, log_path : &str) -> AppResu
         statistics.update(datos);
     }
 
+    statistics.log_data();
     logger.log_info(String::from("[Main] Server down") );
     logger.close();
 
