@@ -29,7 +29,6 @@ pub struct Statistics {
   total_time: Duration,
   requests_amount: u64,
   logger: Logger,
-  requests_finished: u32
 }
 
 
@@ -41,8 +40,7 @@ impl Statistics {
             routes_requested: HashMap::new(),
             total_time: Duration::from_secs(0),
             requests_amount: 0,
-            logger : in_logger,
-            requests_finished: 0
+            logger: in_logger,
         }
     }
     /// Actualiza la estadisticas
@@ -55,7 +53,7 @@ impl Statistics {
         
         *self.routes_requested.entry(route).or_insert(0) += 1;
 
-        if self.requests_finished % 5 == 0 { // traer de env
+        if self.requests_amount % 5 == 0 { // traer de env
             self.log_data();
         }
     }
@@ -68,14 +66,16 @@ impl Statistics {
         top_requested.sort_by_key(|k| k.1);
         
         let mut top_req_str: String = String::new();
-        let index = if top_requested.len() > 5 { 5 } else { top_requested.len() }; // VER SI NO PONER EN ENV ESTO
+        let index = if top_requested.len() > 10 { 10 } else { top_requested.len() }; // VER SI NO PONER EN ENV ESTO
         
         for i in 0..index {
             top_req_str.push_str(top_requested[i].0);
             if i != index-1 { top_req_str.push_str(" // "); };
         }
 
-        self.logger.log_info(format!("[Statistics] Average Request Time: {}", (self.total_time.as_secs() / self.requests_amount) ));
-        self.logger.log_info(format!("[Statistics] Top Requested Routes: {}", top_req_str ));
+        self.logger.log_info(format!("[Statistics] Requests Amount: {}", self.requests_amount ));
+        self.logger.log_info(format!("[Statistics] Total Request Time: {}s", self.total_time.as_secs() ));
+        self.logger.log_info(format!("[Statistics] Average Request Time: {}s", (self.total_time.as_secs() / self.requests_amount) ));
+        self.logger.log_info(format!("[Statistics] Top 10 Requested Routes: {}", top_req_str ));
     }
 }

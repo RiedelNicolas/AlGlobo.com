@@ -8,9 +8,9 @@ pub struct Request {
     destiny: String,
     airline: String,
     with_hotel: bool,
-    stages: u32,
     arrival_time: Instant,
-    completion_time: Duration
+    completion_time: Duration,
+    finished: bool
 }
 
 
@@ -23,9 +23,9 @@ impl Request {
             destiny: destiny.to_string(),
             airline: airline.to_string(),
             with_hotel,
-            stages: 1 + (with_hotel as u32),
             arrival_time: Instant::now(),
-            completion_time: Duration::from_secs(0)
+            completion_time: Duration::from_secs(0),
+            finished: false
         };
 
         Ok(request)
@@ -41,17 +41,15 @@ impl Request {
         self.with_hotel
     }
     
-    /// - 
+    /// Marca request como finalizada y establece el tiempo de resolucion
     pub fn finish(&mut self) {
-        if self.stages > 0 {
-            self.completion_time = self.arrival_time.elapsed();
-            self.stages -= 1;
-        }
+        self.finished = true;
+        self.completion_time = self.arrival_time.elapsed();
     }
     
-    /// Devuelve true en caso de que la reserva se encuentre resuelta.
+    /// Devuelve true en caso de que la reserva se encuentre resuelta
     pub fn has_finished(&self) -> bool {
-        self.stages == 0
+        self.finished
     }
 
     /// Devuelve la ruta del vuelo.
