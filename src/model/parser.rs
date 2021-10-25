@@ -3,6 +3,7 @@ use regex::Regex;
 use super::request::Request;
 use super::logger::Logger;
 
+/// Clase utilizada para parsear los distintos request recibidos mediante texto.
 #[derive(Debug)]
 pub struct Parser {
     reader: io::BufReader<File>,
@@ -16,6 +17,8 @@ use std::{
 };
 
 impl Parser {
+    /// Devuelve una instancia de Parser.
+    /// Recibe el archivo del que debe leer los request y el logger donde debe notificar lo ejecutado.
     pub fn open(path: impl AsRef<std::path::Path>, in_logger : Logger) -> AppResult<Self> {
         let file = File::open(path)?;
         
@@ -28,6 +31,8 @@ impl Parser {
         Ok(parser)
     }
 
+    /// Parsea el archivo de request
+    /// **Alerta** : Metodo bloqueante,finaliza al terminar de procesar los requests.
     pub fn parse_request(&mut self) -> AppResult<Option<Request>> {
 
         loop {

@@ -6,15 +6,15 @@ use std::fs::File;
 use std::fs;
 use std::thread::{self, JoinHandle};
 
-/// Represents a log system.
+/// Representa un log system.
 pub struct LogHandler {
     tx: std::sync::mpsc::Sender<message::Message>,
     logger: Option<JoinHandle<()>>,
 }
 
 impl LogHandler {
-    /// Generates an instances of logHandler
-    /// Receives a path where the log file is going to be constructed.
+    /// Genera una instancia de la clase.
+    /// Recibe un path donde dicho archivo debe ser construido.
     pub fn new( path : &str ) -> LogHandler {
         let (sender, receiver) = std::sync::mpsc::channel::<message::Message>();
         let log_file = fs::OpenOptions::new()
@@ -29,8 +29,8 @@ impl LogHandler {
             logger: Some(thread::spawn( move || LogHandler::print_received(receiver, log_file)))
         }
     }
-    /// Prints all the messages that are waiting in the queue
-    /// Warning : Blocking method
+    /// Imprime todos los mensajes que estan esperando en la cola.
+    /// **Peligro** : Es un metodo bloqueante
     fn print_received(rx: std::sync::mpsc::Receiver<message::Message>, mut log_file: File) {
         loop {
             match rx.recv() {
@@ -53,12 +53,13 @@ impl LogHandler {
         }
     }
 
-    /// returns an instance of a trasmitter, used to send messages to the logger.
+    /// Devuelve una instancia de un Logger.
+    /// Este es usado para enviar los mensajes que se desean imprimir en el log_file
     pub fn get_transmitter(&self) -> Logger {
         Logger::new( &self.tx.clone() )
     }
 
-    /// Blocking, waits until all the messages in the queue are printed. 
+    /// Bloqueante, espera a que se impriman todos los mensajes recibidos. 
     pub fn join(self) {
         if let Some(logger) = self.logger { let _ = logger.join(); }
     }

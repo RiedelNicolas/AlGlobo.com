@@ -2,6 +2,7 @@ use super::message_type::MessageType;
 extern crate chrono;
 use chrono::{DateTime, Local};
 
+/// Tipo de dato utilizado para encapsular los mensajes que envia la clase logger.
 pub struct Message {
     message_type : MessageType,
     text:String
@@ -9,7 +10,7 @@ pub struct Message {
 
 impl Message {
 
-    //creo los 3 constructores 
+    /// Instancia un mensaje de tipo error
     pub fn new_error(in_text:String) -> Message {
         Message {
             text: in_text,
@@ -17,6 +18,7 @@ impl Message {
         }
     }
 
+    /// Instancia un mensaje de tipo Info
     pub fn new_info(in_text:String) -> Message {
         Message {
             text: in_text,
@@ -24,6 +26,7 @@ impl Message {
         }
     }
 
+    /// Instancia un mensaje de tipo Alerta
     pub fn new_warning(in_text:String) -> Message {
         Message {
             text: in_text,
@@ -31,6 +34,7 @@ impl Message {
         }
     }
 
+    /// Mensaje utilizado para cerrar la comunicación.
     pub fn close() -> Message {
         Message {
             text: String::from("__CloseChannelSignal__"),
@@ -38,6 +42,7 @@ impl Message {
         }
     }
 
+    /// Devuelve el estado interno del String formateado como string.
     pub fn generate_string (&self)->String {
     
         let aux : String;
@@ -56,4 +61,5 @@ impl Message {
     pub fn message_type(&self) -> &MessageType {
         &self.message_type
     }
+
 }

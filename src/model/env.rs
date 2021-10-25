@@ -17,8 +17,9 @@ pub struct Configuration {
     pub sleeping_retry_time: u64
 }
 
+/// *Class* used to set the environment variables.
 impl Configuration {
-    fn new() -> Self { 
+    fn new() -> Self {
         Self {
             airline_limit: 10, 
             air_failure_probability: 0.1, 
@@ -33,6 +34,18 @@ impl Configuration {
     }
 }
 
+/// Reads the Environmnents values from the given path.
+/// If the file couldnt be found, default values are asigned.
+/// These values are :
+/// * airline_limit: 10
+/// * air_failure_probability: 0.1
+/// * air_max_work_time: 4000
+/// * hotel_limit: 10
+/// * hotel_failure_probability: 0.1
+/// * hotel_min_work_time: 1000
+/// * hotel_max_work_time: 4000
+/// * sleeping_retry_time: 1000
+/// 
 pub fn get_envs<P: AsRef<Path>>(path: P, logger : Logger) -> Configuration {
     let file = File::open(path).unwrap();
     let reader = BufReader::new(file);
