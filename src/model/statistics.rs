@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::time::Duration;
 use actix::prelude::*;
+use super::configuration::Configuration;
 
 #[derive(Debug)]
 pub struct InfoRequest {
@@ -20,15 +21,17 @@ pub struct LogData;
 pub struct Statistics {
   routes_requested: HashMap<String, u32>,
   total_time: Duration,
-  requests_amount: u64
+  requests_amount: usize,
+  log_rate: usize
 }
 
 impl Statistics {
-    pub fn new() -> Self { 
+    pub fn new(configuration: Configuration) -> Self { 
         Self { 
             routes_requested: HashMap::new(),
             total_time: Duration::from_secs(0),
-            requests_amount: 0
+            requests_amount: 0,
+            log_rate: configuration.statistics_log_rate
         }
     }
 
@@ -62,7 +65,7 @@ impl Handler<Update> for Statistics {
 
         // TODO: Numeros magicos
 
-        if self.requests_amount % 2 == 0 {
+        if self.requests_amount % self.log_rate == 0 {
             self.log();
         }
 

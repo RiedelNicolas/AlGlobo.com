@@ -1,5 +1,4 @@
-use crate::model::administrator::NewRequest;
-
+use crate::model::administrator::{EndOfRequests, NewRequest};
 use super::request::Request;
 use super::administrator::Administrator;
 use super::error::AppResult;
@@ -9,6 +8,8 @@ use std::{
     fs::File,
     io::{self, prelude::*}
 };
+use actix::clock::sleep;
+use std::time::Duration;
 
 #[derive(Message)]
 #[rtype(result = "")]
@@ -22,7 +23,8 @@ pub struct Parser {
 
 impl Parser {
     
-    pub fn open(path: impl AsRef<std::path::Path>, admin: Addr<Administrator>) -> AppResult<Self> {
+    pub fn open(path: impl AsRef<std::path::Path>, 
+                admin: Addr<Administrator>) -> AppResult<Self> {
         let file = File::open(path)?;
 
         let parser = Parser {
@@ -50,7 +52,8 @@ impl Handler<ReadNextLine> for Parser {
             let bytes = self.reader.read_until(b'\n', &mut buffer).unwrap();
    
             if bytes == 0 {
-                return
+                let _ = self.admin.do_send(EndOfRequests);
+                break
             }
             //CAMBIAR ESTE UNWRAP
             let buffer = String::from_utf8(buffer).unwrap().replace("\n", "");
@@ -62,13 +65,9 @@ impl Handler<ReadNextLine> for Parser {
 
             let request = Request::new(&cap[1],&cap[2], &cap[3], &cap[4] == "P");
 
-            if self.admin.try_send(NewRequest(request)).is_err(){
-                println!("Parser: Failing to send a new request to administrator");
-            }
+            self.admin.do_send(NewRequest(request));
 
-            if ctx.address().try_send(ReadNextLine).is_err(){
-                println!("Failing to send a next line message to parser");
-            }
+            ctx.address().do_send(ReadNextLine);
         }
     }
 }

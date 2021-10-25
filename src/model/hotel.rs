@@ -1,6 +1,8 @@
 use actix::prelude::*;
 use crate::model::hotel_connection::{HotelConnection, Request};
 use super::administrator::{Administrator, FinishedWebServiceRequest};
+use super::configuration::Configuration;
+use std::ops::Range;
 
 #[derive(Message)]
 #[rtype(result = "")]
@@ -18,18 +20,21 @@ pub struct Hotel {
     connections: Vec<Addr<HotelConnection>>,
     next_connection: usize,
     max_concurrent_connections: usize,
-    admin: Addr<Administrator>
+    admin: Addr<Administrator>,
+    configuration: Configuration
 }
 
 impl Hotel {
     
-    pub fn new(admin: Addr<Administrator>) -> Hotel {
+    pub fn new( admin: Addr<Administrator>,
+                configuration: Configuration) -> Hotel {
 
         Hotel {
             connections: Vec::new(),
             next_connection: 0,
-            max_concurrent_connections: 10, //TODO: Cargar desde env
-            admin
+            max_concurrent_connections: configuration.hotel_limit,
+            admin,
+            configuration
         }
     }
     
@@ -40,7 +45,10 @@ impl Hotel {
             None => {
                 let conn = HotelConnection::new(
                     hotel_address,
-                    1500..2000
+                    Range {
+                        start: self.configuration.hotel_min_work_time, 
+                        end: self.configuration.hotel_max_work_time 
+                    }
                 ).start();
                 self.connections.push(conn.clone());
                 conn

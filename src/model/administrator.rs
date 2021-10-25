@@ -4,6 +4,7 @@ use super::statistics::{InfoRequest, Statistics, Update};
 use super::hotel::{Hotel, HotelRequest};
 use actix::prelude::*;
 use std::collections::HashMap;
+use super::configuration::Configuration;
 
 #[derive(Message)]
 #[rtype(result = "")]
@@ -13,25 +14,31 @@ pub struct NewRequest(pub Request);
 #[rtype(result = "")]
 pub struct FinishedWebServiceRequest(pub usize);
 
+#[derive(Message)]
+#[rtype(result = "")]
+pub struct EndOfRequests;
+
 pub struct Administrator {
     pending_requests: HashMap<usize, (Request, u32)>,
     airlines: HashMap<String, Addr<Airline>>,
     hotel: Option<Addr<Hotel>>,
-    statistics: Addr<Statistics>
+    statistics: Addr<Statistics>,
+    keep_going: bool,
+    configuration: Configuration
 }
 
 impl Administrator {
-    pub fn new() -> Administrator {
+    pub fn new(configuration: Configuration) -> Administrator {
         Administrator {
             pending_requests: HashMap::new(),
             airlines: HashMap::new(),
             hotel: None,
-            statistics: Statistics::new().start()
+            statistics: Statistics::new(configuration).start(),
+            keep_going: true,
+            configuration
         }
     }
     
-
-
     pub fn update_statistics(&mut self, req: Request) {
 
         let info = InfoRequest {
@@ -45,6 +52,11 @@ impl Administrator {
 
 impl Actor for Administrator {
     type Context = Context<Self>;
+
+
+    fn started(&mut self, ctx: &mut Self::Context) {
+        self.hotel = Some(Hotel::new(ctx.address(), self.configuration.clone()).start());
+    }
 }
 
 impl Handler<NewRequest> for Administrator {
@@ -54,12 +66,16 @@ impl Handler<NewRequest> for Administrator {
 
         let request = msg.0;
 
-        let stages = 1 + request.with_hotel as u32;
+        let with_hotel = request.with_hotel;
+        let stages = 1 + with_hotel as u32;
         let id = request.get_id();
         
+        let conf = &self.configuration;
         let addr = self.airlines
             .entry(request.airline.clone())
-            .or_insert_with(|| Airline::new(&request.airline, ctx.address()).start());
+            .or_insert_with(|| Airline::new(&request.airline,
+                                                    ctx.address(),
+                                                    conf.clone()).start());
         
         self.pending_requests.insert(id, (request, stages));
 
@@ -67,21 +83,13 @@ impl Handler<NewRequest> for Administrator {
             print!("Failing to send [{}] request to airline web service", id);
         }
 
-        match &self.hotel {
-            Some(hotel_address) => {
+        if with_hotel {
+            if let Some(hotel_address) = &self.hotel {
                 if hotel_address.try_send(HotelRequest(id)).is_err(){
                     print!("Failing to send [{}] request to hotel web service", id);
                 }
-            },
-            None => {
-                let hotel = Hotel::new(ctx.address()).start();
-                if hotel.try_send(HotelRequest(id)).is_err(){
-                    print!("Failing to send [{}] request to hotel web service", id);
-                }
-                self.hotel = Some(hotel);
             }
         }
-
     }
 }
 
@@ -96,9 +104,20 @@ impl Handler<FinishedWebServiceRequest> for Administrator {
                 if let Some((mut req, _)) = self.pending_requests.remove(&id) {
                     req.finish();
                     println!("Request [{}]: Finalizada request [{}->{}] por {}", req.get_id(), req.origin, req.destiny, req.airline);
-                    self.update_statistics(req)
+                    self.update_statistics(req);
+                    if !self.keep_going && self.pending_requests.is_empty() {
+                        System::current().stop();
+                    }
                 }
             }
         }  
+    }
+}
+
+impl Handler<EndOfRequests> for Administrator {
+    type Result = ();
+
+    fn handle(&mut self, msg: EndOfRequests, _ctx: &mut Context<Self>) -> Self::Result {
+        self.keep_going = false;  
     }
 }

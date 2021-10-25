@@ -6,7 +6,7 @@ pub mod hotel_connection;
 pub mod request;
 pub mod parser;
 pub mod error;
-pub mod env;
+pub mod configuration;
 pub mod statistics;
 pub mod message_type;
 pub mod logger_message;

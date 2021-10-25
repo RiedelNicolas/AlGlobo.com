@@ -6,7 +6,7 @@ use super::hotel::{
 use actix::clock::sleep;
 use std::time::Duration;
 use rand::Rng;
-use std::collections::VecDeque; //TODO: Modificar por una cola normal
+use std::collections::VecDeque;
 use std::ops::Range;
 
 #[derive(Message)]
@@ -21,13 +21,13 @@ pub struct Request(pub usize);
 pub struct HotelConnection {
     pending_requests: VecDeque<usize>,
     hotel: Addr<Hotel>,
-    work_time_range: Range<u64>
+    work_time_range: Range<usize>
 }
 
 impl HotelConnection {
     
     pub fn new( hotel: Addr<Hotel>, 
-                work_time_range: Range<u64>) -> HotelConnection {
+                work_time_range: Range<usize>) -> HotelConnection {
         HotelConnection {
             pending_requests: VecDeque::new(),
             hotel,
@@ -63,8 +63,8 @@ impl Handler<ProcessRequest> for HotelConnection {
         let id = self.pending_requests.pop_front().unwrap();
         
         println!("Request [{}]: Conectando con el hotel", id);
-
-        Box::pin(sleep(Duration::from_millis(rand::thread_rng().gen_range(self.work_time_range.clone())))
+        let rand_number = rand::thread_rng().gen_range(self.work_time_range.clone());
+        Box::pin(sleep(Duration::from_millis(rand_number as u64))
             .into_actor(self)
             .map(move |_result, me, ctx| {
                 

@@ -23,7 +23,7 @@ pub struct AirlineConnection {
     pending_requests: VecDeque<usize>,
     airline_name: String,
     airline: Addr<Airline>,
-    work_time_range: Range<u64>,
+    work_time_range: Range<usize>,
     failure_probability: f32,
 }
 
@@ -31,7 +31,7 @@ impl AirlineConnection {
     
     pub fn new( airline_name: String,
                 airline: Addr<Airline>, 
-                work_time_range: Range<u64>, 
+                work_time_range: Range<usize>, 
                 failure_probability: f32) -> AirlineConnection {
         AirlineConnection {
             pending_requests: VecDeque::new(),
@@ -71,13 +71,14 @@ impl Handler<ProcessRequest> for AirlineConnection {
         
         println!("Request [{}]: Conectando con la aerolinea {}", id, self.airline_name);
 
-
-        Box::pin(sleep(Duration::from_millis(rand::thread_rng().gen_range(self.work_time_range.clone())))
+        let rand_numb = rand::thread_rng().gen_range(self.work_time_range.clone());
+        Box::pin(sleep(Duration::from_millis(rand_numb as u64))
             .into_actor(self)
             .map(move |_result, me, ctx| {
                 
-                let request_solved = rand::thread_rng().gen::<f32>() >= me.failure_probability;
-            
+                let num_random = rand::thread_rng().gen::<f32>();
+                let request_solved =  num_random >= me.failure_probability;
+                
                 if request_solved {
                     println!("Request [{}]: Request a la aerolinea resuelta", id);
                     if me.airline.try_send(ConnectionFinished(id)).is_err(){

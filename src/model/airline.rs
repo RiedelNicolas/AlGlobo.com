@@ -1,8 +1,10 @@
 use actix::prelude::*;
 use crate::model::airline_connection::{AirlineConnection, Request};
 use super::administrator::{Administrator, FinishedWebServiceRequest};
+use super::configuration::{Configuration};
 use actix::clock::sleep;
 use std::time::Duration;
+use std::ops::Range;
 
 #[derive(Message)]
 #[rtype(result = "")]
@@ -26,21 +28,25 @@ pub struct Airline {
     connections: Vec<Addr<AirlineConnection>>,
     next_connection: usize,
     max_concurrent_connections: usize,
-    sleeping_retry_time: u64,
-    admin: Addr<Administrator>
+    sleeping_retry_time: usize,
+    admin: Addr<Administrator>,
+    configuration: Configuration
 }
 
 impl Airline {
     
-    pub fn new(name: &str, admin: Addr<Administrator>) -> Airline {
+    pub fn new( name: &str, 
+                admin: Addr<Administrator>,
+                configuration: Configuration) -> Airline {
 
         Airline {
             name: name.to_string(),
             connections: Vec::new(),
             next_connection: 0,
-            max_concurrent_connections: 10, //TODO: Cargar desde env
-            sleeping_retry_time: 3000, //TODO: Cargar desde env
-            admin
+            max_concurrent_connections: configuration.airline_limit,
+            sleeping_retry_time: configuration.sleeping_retry_time,
+            admin,
+            configuration
         }
     }
     
@@ -52,8 +58,11 @@ impl Airline {
                 let conn = AirlineConnection::new(
                     self.name.clone(),
                     airline_address,
-                    1500..2000,
-                    0.2
+                    Range {
+                        start: self.configuration.air_min_work_time, 
+                        end: self.configuration.air_max_work_time 
+                    },
+                    self.configuration.air_failure_probability
                 ).start();
                 self.connections.push(conn.clone());
                 conn
@@ -103,7 +112,7 @@ impl Handler<ConnectionFailed> for Airline {
     type Result = ResponseActFuture<Self, ()>;
 
     fn handle(&mut self, msg: ConnectionFailed, _ctx: &mut Context<Self>) -> Self::Result {
-        Box::pin(sleep(Duration::from_millis(self.sleeping_retry_time))
+        Box::pin(sleep(Duration::from_millis(self.sleeping_retry_time as u64))
             .into_actor(self)
             .map(move |_result, me, ctx| {
                 let addr = me.get_next_connection(ctx.address());
