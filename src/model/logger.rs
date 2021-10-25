@@ -15,15 +15,18 @@ impl Actor for Logger {
 // Constructor del logger, 
 impl Logger {
     pub fn new( path : &str ) -> Logger {
-        Logger {
+
+       Logger {
             log_file : fs::OpenOptions::new()
                 .write(true)
                 .append(true)
                 .create(true)
                 .open(path)
-                .unwrap()
+                .expect("No se tiene permisos para crear el log_file")
         }
+
     }
+
 }
 
 
