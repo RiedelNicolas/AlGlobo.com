@@ -1,6 +1,7 @@
 use super::error::{AppResult};
 use std::time::{Duration, Instant};
 
+/// Representa un pedido de reserva particular.
 #[derive(Debug)]
 pub struct Request {
     origin: String,
@@ -12,7 +13,10 @@ pub struct Request {
     completion_time: Duration
 }
 
+
 impl Request {
+    /// Genera una instancia de una solicitud
+    /// Debe recibir por parametros los datos necesarios para construirla.
     pub fn new(origin: &str, destiny: &str, airline: &str, with_hotel: bool) -> AppResult<Self> {
         let request = Request {
             origin: origin.to_string(),
@@ -27,14 +31,17 @@ impl Request {
         Ok(request)
     }
 
+    /// Getter de la aerolinea
     pub fn get_airline(&self) -> &str {
         &self.airline[..]
     }
-    
+
+    /// Responde a la pregunta -> ¿ La reserva es con hotel ?
     pub fn is_package(&self) -> bool {
         self.with_hotel
     }
     
+    /// - 
     pub fn finish(&mut self) {
         if self.stages > 0 {
             self.completion_time = self.arrival_time.elapsed();
@@ -42,14 +49,17 @@ impl Request {
         }
     }
     
+    /// Devuelve true en caso de que la reserva se encuentre resuelta.
     pub fn has_finished(&self) -> bool {
         self.stages == 0
     }
 
+    /// Devuelve la ruta del vuelo.
     pub fn get_route(&self) -> String {
         format!("{}->{}", self.origin, self.destiny)
     }
-    
+
+    /// Tiempo total desde que se hizo la consulta hasta que fue resuelta  
     pub fn get_completion_time(&self) -> &Duration {
         &self.completion_time
     }

@@ -5,6 +5,7 @@ use std::sync::Arc;
 use std::{thread, time};
 use rand::Rng;
 
+/// Clase que modela un webservice
 pub struct WebServiceConnection {
     permission: Arc<Semaphore>,
     work_time_range: Range<u64>,
@@ -13,6 +14,10 @@ pub struct WebServiceConnection {
 
 impl WebServiceConnection {
     
+    /// Instancia un webservice
+    /// Recibe un Semaphore para sincronismo.
+    /// Una probabilidad de fallo (Para simular un webservice real).
+    /// Y un rango que sera utilizado para simular (mediante un aleatorio) cuanto tarda la consulta. 
     pub fn new(permission: Arc<Semaphore>, work_time_range: Range<u64>, failure_probability: f32) -> Self {
         WebServiceConnection {
             permission,

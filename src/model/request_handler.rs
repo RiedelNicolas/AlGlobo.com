@@ -9,6 +9,7 @@ use std::time::{self, Duration};
 use std::sync::{Arc, RwLock};
 use super::logger::Logger;
 
+/// Maneja y distribuye los distintos request que recibe el sistema.
 pub struct RequestHandler {
     request: Arc<RwLock<Request>>,
     airline: Option<JoinHandle<()>>,
@@ -17,6 +18,7 @@ pub struct RequestHandler {
 }
 
 impl RequestHandler {
+    /// Instancia un handler, recibe struct de configuracion y logger.
     pub fn spawn(req: Request, provider: &mut WebServiceProvider, envs: Configuration,
                                                                         in_logger : Logger) -> AppResult<Self> {
         let connection = provider.airline_request(req.get_airline(), envs);
@@ -41,7 +43,7 @@ impl RequestHandler {
 
         Ok(handler)
     }
-
+    /// Procesa una request, recibe una conexiona al webservice donde debe derivar la misma.
     fn process_request(request: Arc<RwLock<Request>>, connection: WebServiceConnection, envs: Configuration, logger : Logger) {
         logger.log_info(String::from("[RequestHandler] Trying to connect to extern web-service"));
         loop {
@@ -70,6 +72,8 @@ impl RequestHandler {
         }
     }
 
+    /// Consulta el estado interno, devuelve true si la request ya fue resuelta.
+    /// False caso contrario.
     pub fn has_finished(&self) -> bool {
         match self.request.read() {
             Ok(req) => req.has_finished(),
@@ -81,6 +85,7 @@ impl RequestHandler {
         }
     }
     
+    /// Alerta : Bloqueante, bloquea la ejecucion hasta que la request fue resuelta.
     pub fn join(self) -> InfoRequest { // VER SI PUEDE FALLAR JOIN QUE HACER
         if let Some(airline) = self.airline { let _ = airline.join(); }
         if let Some(hotel) = self.hotel { let _ = hotel.join(); }

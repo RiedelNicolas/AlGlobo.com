@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::time::Duration;
 use super::logger::Logger;
 
+/// Clase auxiliar utilizada para contener la informacion de un request
 #[derive(Debug)]
 pub struct InfoRequest {
   route: String,
@@ -11,15 +12,17 @@ pub struct InfoRequest {
 impl InfoRequest {
     pub fn new(route: String, time: Duration) -> Self { Self { route, time } }
 
+    /// getter de ruta
     pub fn route(&self) -> String {
         String::from(&self.route)
     }
-
+    /// getter de cuanto tiempo demoro en resolverse la consulta
     pub fn time(&self) -> &Duration {
         &self.time
     }
 }
 
+/// Clase que representa las estadisticas del sistema
 #[derive(Debug)]
 pub struct Statistics {
   routes_requested: HashMap<String, u32>,
@@ -29,7 +32,10 @@ pub struct Statistics {
   requests_finished: u32
 }
 
+
 impl Statistics {
+    /// Genera una instancia de la clase.
+    /// Recibe una referencia al logger donde debe enviar los distintos errores que se le presentan
     pub fn new( in_logger : Logger) -> Self { 
         Self { 
             routes_requested: HashMap::new(),
@@ -39,7 +45,7 @@ impl Statistics {
             requests_finished: 0
         }
     }
-
+    /// Actualiza la estadisticas
     pub fn update(&mut self, req: InfoRequest) {
         let route = req.route();
         let time = *req.time();
@@ -53,7 +59,7 @@ impl Statistics {
             self.log_data();
         }
     }
-
+    /// Imprime las estadisticas generadas en el log file
     pub fn log_data(&self) {
         let mut top_requested: Vec<(&String, &u32)> = Vec::new();
         for (key,value) in self.routes_requested.iter() {
