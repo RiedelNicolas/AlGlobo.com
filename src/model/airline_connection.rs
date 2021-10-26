@@ -10,15 +10,17 @@ use rand::Rng;
 use std::collections::VecDeque; //TODO: Modificar por una cola normal
 use std::ops::Range;
 
+/// Mensaje que indica que se debe procesar una solicitud
 #[derive(Message)]
 #[rtype(result = "")]
 pub struct ProcessRequest;
 
-
+/// Mensaje que representa un request al webservice simulado.
 #[derive(Message)]
 #[rtype(result = "")]
 pub struct Request(pub usize);
 
+/// Mensaje que representa un request al webservice simulado.
 pub struct AirlineConnection {
     pending_requests: VecDeque<usize>,
     airline_name: String,
@@ -27,6 +29,7 @@ pub struct AirlineConnection {
     failure_probability: f32,
 }
 
+/// 
 impl AirlineConnection {
     
     pub fn new( airline_name: String,
