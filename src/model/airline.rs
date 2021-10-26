@@ -5,6 +5,7 @@ use super::configuration::{Configuration};
 use actix::clock::sleep;
 use std::time::Duration;
 use std::ops::Range;
+use super::logger::Logger;
 
 #[derive(Message)]
 #[rtype(result = "")]
@@ -30,14 +31,16 @@ pub struct Airline {
     max_concurrent_connections: usize,
     sleeping_retry_time: usize,
     admin: Addr<Administrator>,
-    configuration: Configuration
+    configuration: Configuration,
+    logger: Addr<Logger>
 }
 
 impl Airline {
     
     pub fn new( name: &str, 
                 admin: Addr<Administrator>,
-                configuration: Configuration) -> Airline {
+                configuration: Configuration,
+                logger: Addr<Logger>) -> Airline {
 
         Airline {
             name: name.to_string(),
@@ -46,7 +49,8 @@ impl Airline {
             max_concurrent_connections: configuration.airline_limit,
             sleeping_retry_time: configuration.sleeping_retry_time,
             admin,
-            configuration
+            configuration,
+            logger
         }
     }
     
@@ -62,7 +66,8 @@ impl Airline {
                         start: self.configuration.air_min_work_time, 
                         end: self.configuration.air_max_work_time 
                     },
-                    self.configuration.air_failure_probability
+                    self.configuration.air_failure_probability,
+                    self.logger.clone()
                 ).start();
                 self.connections.push(conn.clone());
                 conn
@@ -91,9 +96,7 @@ impl Handler<AirlineRequest> for Airline {
         let req_id = msg.0;
         let addr = self.get_next_connection(ctx.address());
 
-        if addr.try_send(Request(req_id)).is_err(){
-            println!("Failing to process request");
-        }
+        addr.do_send(Request(req_id));
     }
 }
 
@@ -102,9 +105,7 @@ impl Handler<ConnectionFinished> for Airline {
     type Result = ();
 
     fn handle(&mut self, msg: ConnectionFinished, _ctx: &mut Context<Self>) -> Self::Result {
-        if self.admin.try_send(FinishedWebServiceRequest(msg.0)).is_err(){
-            println!("Failing to process request");
-        }
+        self.admin.do_send(FinishedWebServiceRequest(msg.0));
     }
 }
 
@@ -117,9 +118,7 @@ impl Handler<ConnectionFailed> for Airline {
             .map(move |_result, me, ctx| {
                 let addr = me.get_next_connection(ctx.address());
                 let id = msg.0;
-                if addr.try_send(Request(id)).is_err(){
-                    println!("Failing to process request");
-                }
+                addr.do_send(Request(id));
             }))
     }
 }

@@ -8,8 +8,6 @@ use std::{
     fs::File,
     io::{self, prelude::*}
 };
-use actix::clock::sleep;
-use std::time::Duration;
 
 #[derive(Message)]
 #[rtype(result = "")]
@@ -48,15 +46,18 @@ impl Handler<ReadNextLine> for Parser {
 
         loop {
             let mut buffer = vec![];
-            //CAMBIAR ESTE UNWRAP, ESTA MAAAAL
-            let bytes = self.reader.read_until(b'\n', &mut buffer).unwrap();
+
+            let bytes = self.reader.read_until(b'\n', &mut buffer)
+                                         .expect("[Parser]: Error trying to read input file");
    
             if bytes == 0 {
-                let _ = self.admin.do_send(EndOfRequests);
+                self.admin.do_send(EndOfRequests);
                 break
             }
-            //CAMBIAR ESTE UNWRAP
-            let buffer = String::from_utf8(buffer).unwrap().replace("\n", "");
+            
+            let buffer = String::from_utf8(buffer)
+                .expect("[Parser]: Error trying to parse string")
+                .replace("\n", "");
 
             let cap = match self.matcher.captures(&buffer) {
                 None => {continue}, //Si no matchea se ignora el pedido

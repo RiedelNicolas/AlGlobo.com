@@ -22,7 +22,7 @@ impl Logger {
                 .append(true)
                 .create(true)
                 .open(path)
-                .expect("No se tiene permisos para crear el log_file")
+                .expect("[Logger]: Log file could not be open")
         }
 
     }
@@ -34,10 +34,12 @@ impl Handler<LoggerMessage> for Logger {
 
     type Result = ();
 
-    fn handle(&mut self, msg: LoggerMessage, ctx: &mut Context <Self>) -> Self::Result {
-        match write!(self.log_file, "{}\n", msg.generate_string() ) {
+    fn handle(&mut self, msg: LoggerMessage, _ctx: &mut Context <Self>) -> Self::Result {
+        let message = msg.generate_string();
+        println!("{}", message);
+        match write!(self.log_file, "{}\n", message ) {
             Ok(v) => v,
-            Err(e) => println!("Error found trying to write the logfile : {}", e)
+            Err(e) => println!("[Logger]: Error found trying to write the logfile : {}", e)
         }
     }
 }

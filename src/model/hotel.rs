@@ -2,6 +2,7 @@ use actix::prelude::*;
 use crate::model::hotel_connection::{HotelConnection, Request};
 use super::administrator::{Administrator, FinishedWebServiceRequest};
 use super::configuration::Configuration;
+use super::logger::Logger;
 use std::ops::Range;
 
 #[derive(Message)]
@@ -21,20 +22,23 @@ pub struct Hotel {
     next_connection: usize,
     max_concurrent_connections: usize,
     admin: Addr<Administrator>,
-    configuration: Configuration
+    configuration: Configuration,
+    logger: Addr<Logger>
 }
 
 impl Hotel {
     
     pub fn new( admin: Addr<Administrator>,
-                configuration: Configuration) -> Hotel {
+                configuration: Configuration,
+                logger: Addr<Logger>) -> Hotel {
 
         Hotel {
             connections: Vec::new(),
             next_connection: 0,
             max_concurrent_connections: configuration.hotel_limit,
             admin,
-            configuration
+            configuration,
+            logger
         }
     }
     
@@ -48,7 +52,8 @@ impl Hotel {
                     Range {
                         start: self.configuration.hotel_min_work_time, 
                         end: self.configuration.hotel_max_work_time 
-                    }
+                    },
+                    self.logger.clone()
                 ).start();
                 self.connections.push(conn.clone());
                 conn
@@ -77,9 +82,7 @@ impl Handler<HotelRequest> for Hotel {
         let req_id = msg.0;
         let addr = self.get_next_connection(ctx.address());
 
-        if addr.try_send(Request(req_id)).is_err(){
-            println!("Failing to process request");
-        }
+        addr.do_send(Request(req_id));
     }
 }
 
@@ -87,9 +90,7 @@ impl Handler<ConnectionFinished> for Hotel {
     type Result = ();
 
     fn handle(&mut self, msg: ConnectionFinished, _ctx: &mut Context<Self>) -> Self::Result {
-        if self.admin.try_send(FinishedWebServiceRequest(msg.0)).is_err(){
-            println!("Failing to process request");
-        }
+        self.admin.do_send(FinishedWebServiceRequest(msg.0));
     }
 }
 

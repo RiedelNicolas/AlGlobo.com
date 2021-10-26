@@ -1,3 +1,6 @@
+use crate::model::logger_message::LoggerMessage;
+use crate::model::statistics::LogData;
+use super::logger::Logger;
 use super::request::Request;
 use super::airline::{Airline, AirlineRequest};
 use super::statistics::{InfoRequest, Statistics, Update};
@@ -24,18 +27,22 @@ pub struct Administrator {
     hotel: Option<Addr<Hotel>>,
     statistics: Addr<Statistics>,
     keep_going: bool,
-    configuration: Configuration
+    configuration: Configuration,
+    logger: Addr<Logger>
 }
 
 impl Administrator {
-    pub fn new(configuration: Configuration) -> Administrator {
+    pub fn new( statistics: Addr<Statistics>, 
+                configuration: Configuration,
+                logger: Addr<Logger>) -> Administrator {
         Administrator {
             pending_requests: HashMap::new(),
             airlines: HashMap::new(),
             hotel: None,
-            statistics: Statistics::new(configuration).start(),
+            statistics: statistics,
             keep_going: true,
-            configuration
+            configuration,
+            logger
         }
     }
     
@@ -46,7 +53,7 @@ impl Administrator {
             time: *req.get_completion_time()
         };
 
-        let _ = self.statistics.try_send(Update(info));
+        self.statistics.do_send(Update(info));
     }
 }
 
@@ -55,7 +62,10 @@ impl Actor for Administrator {
 
 
     fn started(&mut self, ctx: &mut Self::Context) {
-        self.hotel = Some(Hotel::new(ctx.address(), self.configuration.clone()).start());
+        self.hotel = Some(Hotel::new(
+            ctx.address(), 
+            self.configuration.clone(),
+            self.logger.clone()).start());
     }
 }
 
@@ -71,23 +81,21 @@ impl Handler<NewRequest> for Administrator {
         let id = request.get_id();
         
         let conf = &self.configuration;
+        let log = &self.logger;
         let addr = self.airlines
             .entry(request.airline.clone())
             .or_insert_with(|| Airline::new(&request.airline,
                                                     ctx.address(),
-                                                    conf.clone()).start());
+                                                    conf.clone(),
+                                                    log.clone()).start());
         
         self.pending_requests.insert(id, (request, stages));
 
-        if addr.try_send(AirlineRequest(id)).is_err(){
-            print!("Failing to send [{}] request to airline web service", id);
-        }
+        addr.do_send(AirlineRequest(id));
 
         if with_hotel {
             if let Some(hotel_address) = &self.hotel {
-                if hotel_address.try_send(HotelRequest(id)).is_err(){
-                    print!("Failing to send [{}] request to hotel web service", id);
-                }
+                hotel_address.do_send(HotelRequest(id));
             }
         }
     }
@@ -103,9 +111,16 @@ impl Handler<FinishedWebServiceRequest> for Administrator {
             if *stages_left == 0 {
                 if let Some((mut req, _)) = self.pending_requests.remove(&id) {
                     req.finish();
-                    println!("Request [{}]: Finalizada request [{}->{}] por {}", req.get_id(), req.origin, req.destiny, req.airline);
+                    
+                    self.logger.do_send(LoggerMessage::new_info(
+                    format!("[Administrator: {}]: Finalizada request [{}->{}] por {}", 
+                            req.get_id(), 
+                            req.origin, 
+                            req.destiny, 
+                            req.airline)));
                     self.update_statistics(req);
                     if !self.keep_going && self.pending_requests.is_empty() {
+                        self.statistics.do_send(LogData);
                         System::current().stop();
                     }
                 }
@@ -117,7 +132,7 @@ impl Handler<FinishedWebServiceRequest> for Administrator {
 impl Handler<EndOfRequests> for Administrator {
     type Result = ();
 
-    fn handle(&mut self, msg: EndOfRequests, _ctx: &mut Context<Self>) -> Self::Result {
+    fn handle(&mut self, _msg: EndOfRequests, _ctx: &mut Context<Self>) -> Self::Result {
         self.keep_going = false;  
     }
 }

@@ -9,6 +9,8 @@ use std::time::Duration;
 use rand::Rng;
 use std::collections::VecDeque; //TODO: Modificar por una cola normal
 use std::ops::Range;
+use super::logger::Logger;
+use crate::model::logger_message::LoggerMessage;
 
 #[derive(Message)]
 #[rtype(result = "")]
@@ -25,6 +27,7 @@ pub struct AirlineConnection {
     airline: Addr<Airline>,
     work_time_range: Range<usize>,
     failure_probability: f32,
+    logger: Addr<Logger>
 }
 
 impl AirlineConnection {
@@ -32,13 +35,15 @@ impl AirlineConnection {
     pub fn new( airline_name: String,
                 airline: Addr<Airline>, 
                 work_time_range: Range<usize>, 
-                failure_probability: f32) -> AirlineConnection {
+                failure_probability: f32,
+                logger: Addr<Logger>) -> AirlineConnection {
         AirlineConnection {
             pending_requests: VecDeque::new(),
             airline_name,
             airline,
             work_time_range,
-            failure_probability
+            failure_probability,
+            logger
         }
     }
 }
@@ -51,10 +56,8 @@ impl Handler<Request> for AirlineConnection {
     type Result = ();
 
     fn handle(&mut self, msg: Request, ctx: &mut Context<Self>) -> Self::Result {
-        if self.pending_requests.is_empty() && 
-            ctx.address().try_send(ProcessRequest).is_err(){
-            
-            println!("Failing to process request");
+        if self.pending_requests.is_empty(){
+            ctx.address().do_send(ProcessRequest);
         }
         self.pending_requests.push_back(msg.0);
     }
@@ -66,12 +69,15 @@ impl Handler<ProcessRequest> for AirlineConnection {
 
     fn handle(&mut self, _msg: ProcessRequest, _ctx: &mut Context<Self>) -> Self::Result {
 
-        //TODO: Eliminar este unwrap
-        let id = self.pending_requests.pop_front().unwrap();
+        let id = self.pending_requests
+            .pop_front()
+            .expect("[AirlineConnection]: Found an empty queue on ProcessRequest");
         
-        println!("Request [{}]: Conectando con la aerolinea {}", id, self.airline_name);
+        self.logger.do_send(LoggerMessage::new_info(
+            format!("[AirlineConnection: {}]: Conectando con la aerolinea {}", id, self.airline_name)));
 
         let rand_numb = rand::thread_rng().gen_range(self.work_time_range.clone());
+        
         Box::pin(sleep(Duration::from_millis(rand_numb as u64))
             .into_actor(self)
             .map(move |_result, me, ctx| {
@@ -80,21 +86,18 @@ impl Handler<ProcessRequest> for AirlineConnection {
                 let request_solved =  num_random >= me.failure_probability;
                 
                 if request_solved {
-                    println!("Request [{}]: Request a la aerolinea resuelta", id);
-                    if me.airline.try_send(ConnectionFinished(id)).is_err(){
-                        println!("Failing to send [{}] completed request to airline", id);
-                    }
+                    me.logger.do_send(LoggerMessage::new_info(
+                        format!("[AirlineConnection: {}]: Request a la aerolinea resuelta", id)));
+                    me.airline.do_send(ConnectionFinished(id));
                 } else {
-                    println!("Request [{}]: Fallo al resolver la request", id);
-                    if me.airline.try_send(ConnectionFailed(id)).is_err(){
-                        println!("Failing to send [{}] completed request to airline", id);
-                    }
+                    me.logger.do_send(LoggerMessage::new_info(
+                        format!("[AirlineConnection: {}]: Fallo al resolver la request", id)));
+                    me.airline.do_send(ConnectionFailed(id));
                 }
 
-                if !me.pending_requests.is_empty() &&
-                        ctx.address().try_send(ProcessRequest).is_err() {
-                        println!("Failing to process request");
-                    }
+                if !me.pending_requests.is_empty(){
+                    ctx.address().do_send(ProcessRequest);
+                }
             }))
     }
 }
