@@ -48,7 +48,16 @@ impl Configuration {
 /// * sleeping_retry_time: 1000
 /// 
 pub fn get_envs<P: AsRef<Path>>(path: P, logger : Logger) -> Configuration {
-    let file = File::open(path).unwrap();
+    let file = match File::open(path) {
+        Ok(r) => {
+            r
+        },
+        Err(_) => {
+            logger.log_warning(String::from("[Configuration] Unable to load config file, using default values"));
+            return Configuration::new();
+        } 
+    };
+
     let reader = BufReader::new(file);
 
     let config: Configuration = match serde_json::from_reader(reader) {

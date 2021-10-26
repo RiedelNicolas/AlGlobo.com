@@ -81,7 +81,6 @@ impl Statistics {
         }
 
         self.logger.log_info(format!("[Statistics] Requests Amount: {}", self.requests_amount ));
-        self.logger.log_info(format!("[Statistics] Total Request Time: {}s", self.total_time.as_secs() ));
         self.logger.log_info(format!("[Statistics] Average Request Time: {}s", (self.total_time.as_secs() / self.requests_amount) ));
         self.logger.log_info(format!("[Statistics] Top 10 Requested Routes: {}", top_req_str ));
     }
