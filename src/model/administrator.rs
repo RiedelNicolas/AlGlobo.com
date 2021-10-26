@@ -49,7 +49,7 @@ impl Administrator {
             logger
         }
     }
-    /// Actualiza las estadisticas internas. (Deberia ser privada?)
+    /// Actualiza las estadisticas internas.
     pub fn update_statistics(&mut self, req: Request) {
 
         let info = InfoRequest {
