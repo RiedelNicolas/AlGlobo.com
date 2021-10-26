@@ -1,7 +1,10 @@
-use super::error::AppResult;
 use super::logger::Logger;
 use super::request::Request;
+use super::{env::Configuration, error::AppResult};
+use rand::Rng;
 use regex::Regex;
+use std::ops::Range;
+use std::{thread, time};
 
 /// Clase utilizada para parsear los distintos request recibidos mediante texto.
 #[derive(Debug)]
@@ -9,6 +12,7 @@ pub struct Parser {
     reader: io::BufReader<File>,
     matcher: Regex,
     logger: Logger,
+    req_arrival_range: Range<usize>,
 }
 
 use std::{
@@ -19,13 +23,21 @@ use std::{
 impl Parser {
     /// Devuelve una instancia de Parser.
     /// Recibe el archivo del que debe leer los request y el logger donde debe notificar lo ejecutado.
-    pub fn open(path: impl AsRef<std::path::Path>, in_logger: Logger) -> AppResult<Self> {
+    pub fn open(
+        path: impl AsRef<std::path::Path>,
+        in_logger: Logger,
+        config: Configuration,
+    ) -> AppResult<Self> {
         let file = File::open(path)?;
 
         let parser = Parser {
             reader: io::BufReader::new(file),
             matcher: Regex::new(r"^([A-Z]{3}),([A-Z]{3}),([A-z]+),([PV])$")?,
             logger: in_logger.clone(),
+            req_arrival_range: Range {
+                start: config.parser_min_req_arrival_time,
+                end: config.parser_max_req_arrival_time,
+            },
         };
 
         in_logger.log_info(String::from(
@@ -56,12 +68,16 @@ impl Parser {
                     ));
                     continue;
                 }
-                Some(value) => {
-                    self.logger.log_info(format!("[Parser] Request read from '{}' to '{}' flying with '{}' requesting hotel '{}' ",
-                    &value[1], &value[2], &value[3], &value[4]=="P"));
-                    value
-                }
+                Some(value) => value
             };
+
+            // Simulacion tiempo de arribo
+            let mut rng = rand::thread_rng();
+            let arrival_time = rng.gen_range(self.req_arrival_range.clone());
+            thread::sleep(time::Duration::from_millis(arrival_time as u64));
+
+            self.logger.log_info(format!("[Parser] Request read from '{}' to '{}' flying with '{}' requesting hotel '{}' ",
+                    &cap[1], &cap[2], &cap[3], &cap[4]=="P"));
 
             let request = Request::new(&cap[1], &cap[2], &cap[3], &cap[4] == "P")?;
             return Ok(Some(request));

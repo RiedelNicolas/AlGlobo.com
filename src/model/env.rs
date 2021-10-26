@@ -16,6 +16,8 @@ pub struct Configuration {
     pub sleeping_retry_time: u64,
     pub stats_log_rate: u64,
     pub stats_top_req_amount: usize,
+    pub parser_min_req_arrival_time: usize,
+    pub parser_max_req_arrival_time: usize,
 }
 
 /// Clase utilizada para la configuracion de variables de entorno.
@@ -32,6 +34,8 @@ impl Configuration {
             sleeping_retry_time: 1000,
             stats_log_rate: 5,
             stats_top_req_amount: 10,
+            parser_min_req_arrival_time: 300,
+            parser_max_req_arrival_time: 800,
         }
     }
 }

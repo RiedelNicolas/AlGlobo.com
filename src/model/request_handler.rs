@@ -134,8 +134,8 @@ impl RequestHandler {
             "{} Trying to connect to hotel extern web-service",
             rh_string
         ));
-        logger.log_info(format!("{} Hotel request completed", rh_string));
         let _ = connection.resolve_request(); // Las request al hotel no fallan
+        logger.log_info(format!("{} Hotel request completed", rh_string));
         barrier.wait();
     }
 

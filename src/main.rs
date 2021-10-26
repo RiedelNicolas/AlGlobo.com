@@ -19,7 +19,7 @@ fn process_requests(csv_path: &str, json_path: &str, log_path: &str) -> AppResul
     let log = LogHandler::new(log_path);
     let envs = env::get_envs(json_path, log.get_transmitter());
     let statistics = Arc::new(Mutex::new(Statistics::new(log.get_transmitter(), envs)));
-    let mut parser = Parser::open(std::path::Path::new(csv_path), log.get_transmitter())?;
+    let mut parser = Parser::open(std::path::Path::new(csv_path), log.get_transmitter(), envs)?;
     let mut web_provider =
         WebServiceProvider::new(envs.airline_limit, envs.hotel_limit, log.get_transmitter());
     let mut handlers: Vec<RequestHandler> = Vec::new();
