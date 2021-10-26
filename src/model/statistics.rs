@@ -52,8 +52,8 @@ impl Statistics {
         let mut top_req_str: String = String::new();
         let index = if top_requested.len() > self.top_req_amount { self.top_req_amount } else { top_requested.len() };
         
-        for i in 0..index {
-            top_req_str.push_str(top_requested[i].0);
+        for (i, item) in top_requested.iter().enumerate().take(index) {
+            top_req_str.push_str(item.0);
             if i != index-1 { top_req_str.push_str(" // "); };
         }
 

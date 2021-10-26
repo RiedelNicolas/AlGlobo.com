@@ -2,6 +2,9 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 use serde::{Deserialize, Serialize};
+use crate::model::logger_message::LoggerMessage;
+use super::logger::Logger;
+use actix::prelude::Addr;
 
 #[derive(Serialize, Deserialize, Clone, Copy)]
 pub struct Configuration {
@@ -35,11 +38,15 @@ impl Configuration {
     }
 }
 
-pub fn get_envs<P: AsRef<Path>>(path: P) -> Configuration {
+pub fn get_envs<P: AsRef<Path>>(path: P, logger: Addr<Logger>) -> Configuration {
 
     let file = match File::open(path) {
         Ok(r) => r,
-        Err(_) => {return Configuration::new()}
+        Err(_) => {
+            logger.do_send(LoggerMessage::new_warning(
+                "[Configuration]: Could not open specified configurations file".to_string()));
+            return Configuration::new()
+        }
     };
 
     let reader = BufReader::new(file);

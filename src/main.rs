@@ -27,20 +27,21 @@ fn main() -> Result<(), Box<dyn Error>> {
         None => String::from("files/log_file.txt")
     };
 
-    let configuration = get_envs(json_path);
+    
 
     let system = System::new();
 
     system.block_on(async {
         let logger_addr = Logger::new(&log_path).start();
-        let stats_addr = Statistics::new(configuration.clone(), 
+        let configuration = get_envs(json_path, logger_addr.clone());
+        let stats_addr = Statistics::new(configuration, 
                                                         logger_addr.clone()).start();
         let admin_addr = Administrator::new(
             stats_addr,
-                    configuration.clone(), 
+                    configuration, 
                     logger_addr.clone()).start();
 
-        match Parser::open(csv_path, admin_addr) {
+        match Parser::open(csv_path, admin_addr, logger_addr.clone()) {
             Ok(parser) => {
                 parser.start().do_send(ReadNextLine);
                 logger_addr.do_send(LoggerMessage::new_info(String::from("[Main]: Server up")));

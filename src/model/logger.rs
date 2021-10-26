@@ -37,7 +37,7 @@ impl Handler<LoggerMessage> for Logger {
     fn handle(&mut self, msg: LoggerMessage, _ctx: &mut Context <Self>) -> Self::Result {
         let message = msg.generate_string();
         println!("{}", message);
-        match write!(self.log_file, "{}\n", message ) {
+        match writeln!(self.log_file, "{}", message ) {
             Ok(v) => v,
             Err(e) => println!("[Logger]: Error found trying to write the logfile : {}", e)
         }

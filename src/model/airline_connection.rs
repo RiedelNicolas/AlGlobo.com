@@ -93,7 +93,7 @@ impl Handler<ProcessRequest> for AirlineConnection {
                         format!("[AirlineConnection: {}]: Request a la aerolinea resuelta", id)));
                     me.airline.do_send(ConnectionFinished(id));
                 } else {
-                    me.logger.do_send(LoggerMessage::new_info(
+                    me.logger.do_send(LoggerMessage::new_warning(
                         format!("[AirlineConnection: {}]: Fallo al resolver la request", id)));
                     me.airline.do_send(ConnectionFailed(id));
                 }

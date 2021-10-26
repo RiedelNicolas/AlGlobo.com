@@ -1,4 +1,4 @@
-use crate::model::administrator::{EndOfRequests, NewRequest};
+use crate::model::{administrator::{EndOfRequests, NewRequest}, logger_message::LoggerMessage};
 use super::request::Request;
 use super::administrator::Administrator;
 use super::error::AppResult;
@@ -8,6 +8,7 @@ use std::{
     fs::File,
     io::{self, prelude::*}
 };
+use super::logger::Logger;
 
 #[derive(Message)]
 #[rtype(result = "")]
@@ -16,19 +17,22 @@ pub struct ReadNextLine;
 pub struct Parser {
     reader: io::BufReader<File>,
     matcher: Regex,
-    admin: Addr<Administrator>
+    admin: Addr<Administrator>,
+    logger: Addr<Logger>
 }
 
 impl Parser {
     
     pub fn open(path: impl AsRef<std::path::Path>, 
-                admin: Addr<Administrator>) -> AppResult<Self> {
+                admin: Addr<Administrator>,
+                logger: Addr<Logger>) -> AppResult<Self> {
         let file = File::open(path)?;
 
         let parser = Parser {
             reader: io::BufReader::new(file),
             matcher: Regex::new(r"^([A-Z]{3}),([A-Z]{3}),([A-z]+),([PV])$")?,
-            admin
+            admin,
+            logger
         };
 
         Ok(parser)
@@ -60,7 +64,10 @@ impl Handler<ReadNextLine> for Parser {
                 .replace("\n", "");
 
             let cap = match self.matcher.captures(&buffer) {
-                None => {continue}, //Si no matchea se ignora el pedido
+                None => {
+                    self.logger.do_send(LoggerMessage::new_warning("[Parser]: Bad format on input line found".to_string()));
+                    continue
+                }, 
                 Some(value) => value
             };
 

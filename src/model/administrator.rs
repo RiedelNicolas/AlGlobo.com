@@ -36,19 +36,14 @@ pub struct Administrator {
 }
 
 impl Administrator {
-<<<<<<< HEAD
     pub fn new( statistics: Addr<Statistics>, 
                 configuration: Configuration,
                 logger: Addr<Logger>) -> Administrator {
-=======
-    /// Genera una instancia de un Administrator
-    pub fn new(configuration: Configuration) -> Administrator {
->>>>>>> 9c5c23660b848ccf2e72339e79b755871c6270a0
         Administrator {
             pending_requests: HashMap::new(),
             airlines: HashMap::new(),
             hotel: None,
-            statistics: statistics,
+            statistics,
             keep_going: true,
             configuration,
             logger
@@ -73,7 +68,7 @@ impl Actor for Administrator {
     fn started(&mut self, ctx: &mut Self::Context) {
         self.hotel = Some(Hotel::new(
             ctx.address(), 
-            self.configuration.clone(),
+            self.configuration,
             self.logger.clone()).start());
     }
 
@@ -97,7 +92,7 @@ impl Handler<NewRequest> for Administrator {
             .entry(request.airline.clone())
             .or_insert_with(|| Airline::new(&request.airline,
                                                     ctx.address(),
-                                                    conf.clone(),
+                                                    *conf,
                                                     log.clone()).start());
         
         self.pending_requests.insert(id, (request, stages));
