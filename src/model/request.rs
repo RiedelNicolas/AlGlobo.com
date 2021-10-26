@@ -9,11 +9,10 @@ pub struct Request {
     pub airline: String,
     pub with_hotel: bool,
     pub arrival_time: Instant,
-    pub completion_time: Duration
+    pub completion_time: Duration,
 }
 
 impl Request {
-
     pub fn new(origin: &str, destiny: &str, airline: &str, with_hotel: bool) -> Self {
         Request {
             id: Id::new(),
@@ -22,7 +21,7 @@ impl Request {
             airline: airline.to_string(),
             with_hotel,
             arrival_time: Instant::now(),
-            completion_time: Duration::from_secs(0)
+            completion_time: Duration::from_secs(0),
         }
     }
 
@@ -41,5 +40,4 @@ impl Request {
     pub fn get_route(&self) -> String {
         format!("{}->{}", self.origin, self.destiny)
     }
-
 }
