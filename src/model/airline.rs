@@ -13,10 +13,6 @@ pub struct AirlineRequest(pub usize);
 
 #[derive(Message)]
 #[rtype(result = "")]
-pub struct WaitAndProcessRequest;
-
-#[derive(Message)]
-#[rtype(result = "")]
 pub struct ConnectionFinished(pub usize);
 
 #[derive(Message)]
