@@ -1,16 +1,15 @@
-use actix::prelude::*;
-use crate::model::airline_connection::{AirlineConnection, Request};
 use super::administrator::{Administrator, FinishedWebServiceRequest};
-use super::configuration::{Configuration};
-use actix::clock::sleep;
-use std::time::Duration;
-use std::ops::Range;
+use super::configuration::Configuration;
 use super::logger::Logger;
+use crate::model::airline_connection::{AirlineConnection, Request};
+use actix::clock::sleep;
+use actix::prelude::*;
+use std::ops::Range;
+use std::time::Duration;
 
 #[derive(Message)]
 #[rtype(result = "")]
 pub struct AirlineRequest(pub usize);
-
 
 #[derive(Message)]
 #[rtype(result = "")]
@@ -32,16 +31,16 @@ pub struct Airline {
     sleeping_retry_time: usize,
     admin: Addr<Administrator>,
     configuration: Configuration,
-    logger: Addr<Logger>
+    logger: Addr<Logger>,
 }
 
 impl Airline {
-    
-    pub fn new( name: &str, 
-                admin: Addr<Administrator>,
-                configuration: Configuration,
-                logger: Addr<Logger>) -> Airline {
-
+    pub fn new(
+        name: &str,
+        admin: Addr<Administrator>,
+        configuration: Configuration,
+        logger: Addr<Logger>,
+    ) -> Airline {
         Airline {
             name: name.to_string(),
             connections: Vec::new(),
@@ -50,25 +49,28 @@ impl Airline {
             sleeping_retry_time: configuration.sleeping_retry_time,
             admin,
             configuration,
-            logger
+            logger,
         }
     }
-    
-    pub fn get_next_connection(&mut self, airline_address: Addr<Airline>) -> Addr<AirlineConnection> {
-        
-        let connection = match self.connections.get_mut(self.next_connection){
+
+    pub fn get_next_connection(
+        &mut self,
+        airline_address: Addr<Airline>,
+    ) -> Addr<AirlineConnection> {
+        let connection = match self.connections.get_mut(self.next_connection) {
             Some(conn) => conn.clone(),
             None => {
                 let conn = AirlineConnection::new(
                     self.name.clone(),
                     airline_address,
                     Range {
-                        start: self.configuration.air_min_work_time, 
-                        end: self.configuration.air_max_work_time 
+                        start: self.configuration.air_min_work_time,
+                        end: self.configuration.air_max_work_time,
                     },
                     self.configuration.air_failure_probability,
-                    self.logger.clone()
-                ).start();
+                    self.logger.clone(),
+                )
+                .start();
                 self.connections.push(conn.clone());
                 conn
             }
@@ -82,7 +84,6 @@ impl Airline {
 
         connection
     }
-
 }
 
 impl Actor for Airline {
@@ -100,7 +101,6 @@ impl Handler<AirlineRequest> for Airline {
     }
 }
 
-
 impl Handler<ConnectionFinished> for Airline {
     type Result = ();
 
@@ -113,12 +113,14 @@ impl Handler<ConnectionFailed> for Airline {
     type Result = ResponseActFuture<Self, ()>;
 
     fn handle(&mut self, msg: ConnectionFailed, _ctx: &mut Context<Self>) -> Self::Result {
-        Box::pin(sleep(Duration::from_millis(self.sleeping_retry_time as u64))
-            .into_actor(self)
-            .map(move |_result, me, ctx| {
-                let addr = me.get_next_connection(ctx.address());
-                let id = msg.0;
-                addr.do_send(Request(id));
-            }))
+        Box::pin(
+            sleep(Duration::from_millis(self.sleeping_retry_time as u64))
+                .into_actor(self)
+                .map(move |_result, me, ctx| {
+                    let addr = me.get_next_connection(ctx.address());
+                    let id = msg.0;
+                    addr.do_send(Request(id));
+                }),
+        )
     }
 }

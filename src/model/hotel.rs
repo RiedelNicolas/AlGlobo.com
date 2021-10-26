@@ -1,8 +1,8 @@
-use actix::prelude::*;
-use crate::model::hotel_connection::{HotelConnection, Request};
 use super::administrator::{Administrator, FinishedWebServiceRequest};
 use super::configuration::Configuration;
 use super::logger::Logger;
+use crate::model::hotel_connection::{HotelConnection, Request};
+use actix::prelude::*;
 use std::ops::Range;
 
 #[derive(Message)]
@@ -23,38 +23,38 @@ pub struct Hotel {
     max_concurrent_connections: usize,
     admin: Addr<Administrator>,
     configuration: Configuration,
-    logger: Addr<Logger>
+    logger: Addr<Logger>,
 }
 
 impl Hotel {
-    
-    pub fn new( admin: Addr<Administrator>,
-                configuration: Configuration,
-                logger: Addr<Logger>) -> Hotel {
-
+    pub fn new(
+        admin: Addr<Administrator>,
+        configuration: Configuration,
+        logger: Addr<Logger>,
+    ) -> Hotel {
         Hotel {
             connections: Vec::new(),
             next_connection: 0,
             max_concurrent_connections: configuration.hotel_limit,
             admin,
             configuration,
-            logger
+            logger,
         }
     }
-    
+
     pub fn get_next_connection(&mut self, hotel_address: Addr<Hotel>) -> Addr<HotelConnection> {
-        
-        let connection = match self.connections.get_mut(self.next_connection){
+        let connection = match self.connections.get_mut(self.next_connection) {
             Some(conn) => conn.clone(),
             None => {
                 let conn = HotelConnection::new(
                     hotel_address,
                     Range {
-                        start: self.configuration.hotel_min_work_time, 
-                        end: self.configuration.hotel_max_work_time 
+                        start: self.configuration.hotel_min_work_time,
+                        end: self.configuration.hotel_max_work_time,
                     },
-                    self.logger.clone()
-                ).start();
+                    self.logger.clone(),
+                )
+                .start();
                 self.connections.push(conn.clone());
                 conn
             }
@@ -68,7 +68,6 @@ impl Hotel {
 
         connection
     }
-
 }
 
 impl Actor for Hotel {
@@ -93,4 +92,3 @@ impl Handler<ConnectionFinished> for Hotel {
         self.admin.do_send(FinishedWebServiceRequest(msg.0));
     }
 }
-
