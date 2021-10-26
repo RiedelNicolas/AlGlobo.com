@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["MessageType","Enum que contiene los distintos tipos que puede tener un mensaje."]]});

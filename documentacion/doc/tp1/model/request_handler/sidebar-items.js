@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["RequestHandler","Maneja y distribuye los distintos request que recibe el sistema."]]});

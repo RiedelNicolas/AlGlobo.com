@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["WebServiceProvider","Clase que modela un webProvider"]]});
