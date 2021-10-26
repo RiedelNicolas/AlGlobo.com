@@ -73,8 +73,7 @@ impl Statistics {
         )));
         self.logger.do_send(LoggerMessage::new_info(format!(
             "[Statistics] Top {} Requested Routes: {}",
-            self.top_req_amount,
-            top_req_str
+            self.top_req_amount, top_req_str
         )));
     }
 }
