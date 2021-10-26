@@ -7,18 +7,30 @@ use actix::prelude::*;
 use std::ops::Range;
 use std::time::Duration;
 
+/// Mensaje que representa una solicitud a la aerolinea
 #[derive(Message)]
 #[rtype(result = "")]
 pub struct AirlineRequest(pub usize);
 
 #[derive(Message)]
 #[rtype(result = "")]
+<<<<<<< HEAD
+=======
+pub struct WaitAndProcessRequest;
+
+///Mensaje que representa el fin de la conexion con una aerolinea
+#[derive(Message)]
+#[rtype(result = "")]
+>>>>>>> f55ed69982f7c25df15d5052a9ef3b765fb705cf
 pub struct ConnectionFinished(pub usize);
 
+///Menaje que representa el fallo en una conexion
 #[derive(Message)]
 #[rtype(result = "")]
 pub struct ConnectionFailed(pub usize);
 
+/// Clase que representa una aerolinea, encarga de mantener y administrar las distintas
+/// conexiones a la misma
 pub struct Airline {
     name: String,
     connections: Vec<Addr<AirlineConnection>>,
@@ -31,6 +43,7 @@ pub struct Airline {
 }
 
 impl Airline {
+    /// Genera una instancia de una aerolinea, la misma es identificada con el parametro "Name".
     pub fn new(
         name: &str,
         admin: Addr<Administrator>,
@@ -48,7 +61,7 @@ impl Airline {
             logger,
         }
     }
-
+    /// Devuelve una nueva conexion a la aerolinea.
     pub fn get_next_connection(
         &mut self,
         airline_address: Addr<Airline>,
@@ -88,7 +101,7 @@ impl Actor for Airline {
 
 impl Handler<AirlineRequest> for Airline {
     type Result = ();
-
+    /// Handler que maneja un request de una conexion nueva.
     fn handle(&mut self, msg: AirlineRequest, ctx: &mut Context<Self>) -> Self::Result {
         let req_id = msg.0;
         let addr = self.get_next_connection(ctx.address());
@@ -99,7 +112,7 @@ impl Handler<AirlineRequest> for Airline {
 
 impl Handler<ConnectionFinished> for Airline {
     type Result = ();
-
+    /// Handler que maneja la finalizacion de una conexion
     fn handle(&mut self, msg: ConnectionFinished, _ctx: &mut Context<Self>) -> Self::Result {
         self.admin.do_send(FinishedWebServiceRequest(msg.0));
     }
@@ -107,7 +120,7 @@ impl Handler<ConnectionFinished> for Airline {
 
 impl Handler<ConnectionFailed> for Airline {
     type Result = ResponseActFuture<Self, ()>;
-
+    /// Handler que simula el fallo en una conexion.
     fn handle(&mut self, msg: ConnectionFailed, _ctx: &mut Context<Self>) -> Self::Result {
         Box::pin(
             sleep(Duration::from_millis(self.sleeping_retry_time as u64))

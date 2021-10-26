@@ -17,6 +17,8 @@ pub struct WaitAndProcessRequest;
 #[rtype(result = "")]
 pub struct ConnectionFinished(pub usize);
 
+/// Clase que representa un hotel, encargado de manejar las distintas conexiones simuladas.
+/// ACLARACION : Se considera a el hotel como unico.
 pub struct Hotel {
     connections: Vec<Addr<HotelConnection>>,
     next_connection: usize,
@@ -41,7 +43,7 @@ impl Hotel {
             logger,
         }
     }
-
+    /// Devuelve una nueva conexion a la aerolinea.
     pub fn get_next_connection(&mut self, hotel_address: Addr<Hotel>) -> Addr<HotelConnection> {
         let connection = match self.connections.get_mut(self.next_connection) {
             Some(conn) => conn.clone(),

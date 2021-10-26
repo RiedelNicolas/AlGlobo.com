@@ -17,6 +17,7 @@ use std::{
 #[rtype(result = "")]
 pub struct ReadNextLine;
 
+/// Clase utilizada para parsear el archivo csv con las solicitudes a procesar.
 pub struct Parser {
     reader: io::BufReader<File>,
     matcher: Regex,
@@ -25,6 +26,7 @@ pub struct Parser {
 }
 
 impl Parser {
+    /// instancia un parser, el archivo recibido en el parametro path debe existir.
     pub fn open(
         path: impl AsRef<std::path::Path>,
         admin: Addr<Administrator>,
@@ -49,7 +51,9 @@ impl Actor for Parser {
 
 impl Handler<ReadNextLine> for Parser {
     type Result = ();
-
+    /// Handler que lee la siguiente linea del archivo
+    /// En caso de que la linea sea valida : envia la informacion necesaria al administrator
+    /// caso contrario, continua con la siguiente linea.
     fn handle(&mut self, _msg: ReadNextLine, ctx: &mut Context<Self>) -> Self::Result {
         loop {
             let mut buffer = vec![];

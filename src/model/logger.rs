@@ -4,6 +4,7 @@ use std::fs;
 use std::fs::File;
 use std::io::Write;
 
+///Clase Logger
 pub struct Logger {
     log_file: File,
 }
@@ -12,7 +13,8 @@ impl Actor for Logger {
     type Context = Context<Self>;
 }
 
-// Constructor del logger,
+/// Constructor del logger, devuelve una instancia.
+/// El string recibido por parametros es la ruta al archivo donde se escriben los mensajes
 impl Logger {
     pub fn new(path: &str) -> Logger {
         Logger {
