@@ -21,6 +21,7 @@ pub struct FinishedWebServiceRequest(pub usize);
 #[rtype(result = "")]
 pub struct EndOfRequests;
 
+/// Clase encarga de manejar los distintos webservice y derivar las solicitudes.
 pub struct Administrator {
     pending_requests: HashMap<usize, (Request, u32)>,
     airlines: HashMap<String, Addr<Airline>>,
@@ -31,6 +32,7 @@ pub struct Administrator {
 }
 
 impl Administrator {
+    /// Genera una instancia de un Administrator
     pub fn new(configuration: Configuration) -> Administrator {
         Administrator {
             pending_requests: HashMap::new(),
@@ -41,7 +43,7 @@ impl Administrator {
             configuration
         }
     }
-    
+    /// Actualiza las estadisticas internas. (Deberia ser privada?)
     pub fn update_statistics(&mut self, req: Request) {
 
         let info = InfoRequest {
@@ -60,11 +62,13 @@ impl Actor for Administrator {
     fn started(&mut self, ctx: &mut Self::Context) {
         self.hotel = Some(Hotel::new(ctx.address(), self.configuration.clone()).start());
     }
+
 }
+
 
 impl Handler<NewRequest> for Administrator {
     type Result = ();
-
+    /// Handler que maneja la creacion de solicitudes.
     fn handle(&mut self, msg: NewRequest, ctx: &mut Context<Self>) -> Self::Result {
 
         let request = msg.0;
@@ -96,6 +100,7 @@ impl Handler<NewRequest> for Administrator {
     }
 }
 
+/// Handler para manejar la finalizacion de una solicitud.
 impl Handler<FinishedWebServiceRequest> for Administrator {
     type Result = ();
 
@@ -117,6 +122,7 @@ impl Handler<FinishedWebServiceRequest> for Administrator {
     }
 }
 
+/// Handler que maneja el fin de las solicitudes. (Cerrar la comunicacion)
 impl Handler<EndOfRequests> for Administrator {
     type Result = ();
 
