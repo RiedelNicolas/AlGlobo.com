@@ -39,7 +39,9 @@ impl LogHandler {
                     match *r.message_type() {
                         MessageType::Close => return,
                         _ => {
-                            match writeln!(log_file, "{}", r.generate_string() ) {
+                            let msg = r.generate_string();
+                            println!("{}",msg);
+                            match writeln!(log_file, "{}", msg ) {
                                 Ok(v) => v,
                                 Err(e) => println!("[LogHandler] Error found trying to write the logfile : {}", e)
                             }

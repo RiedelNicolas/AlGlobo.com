@@ -9,7 +9,12 @@ use model::env;
 use model::log_handler::LogHandler;
 use std::sync::{Arc, Mutex};
 
-/// COMPLETAR
+/// Encapsula el flujo principal del programa.
+/// Encargada de instanciar las distintas entidades que componen el programa y relacionarlas.
+/// Recibe los argumentos necesarios para iniciar el mismo  :
+/// * Ruta valida a un archivo csv de donde debe leer las solicitudes. (El archivo debe existir y estar correctamente cargado)
+/// * Ruta valida a archivo .json con la configuracion a utilizar. (En caso de que este no exista se utilizara la configuracion por defecto)
+/// * Ruta valida a un log_file, en caso de que este archivo no exista se creara uno en el path aportado.  
 fn process_requests(csv_path: &str, json_path: &str, log_path : &str) -> AppResult<()>{
 
     let log = LogHandler::new(log_path);
@@ -62,7 +67,8 @@ fn process_requests(csv_path: &str, json_path: &str, log_path : &str) -> AppResu
     Ok(())
 }
 
-/// COMPLETAR
+/// Sincroniza la ejecucion del programa con los hilos generados.
+/// Para poder finalizar la ejecucion de forma ordenada
 fn clean_finished(handlers: &mut Vec<RequestHandler>) {
     let mut i = 0;
 
