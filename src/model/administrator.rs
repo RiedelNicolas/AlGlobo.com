@@ -6,14 +6,17 @@ use actix::prelude::*;
 use std::collections::HashMap;
 use super::configuration::Configuration;
 
+/// Mensaje utilizado para iniciar una nueva Solicitud.
 #[derive(Message)]
 #[rtype(result = "")]
 pub struct NewRequest(pub Request);
 
+/// Mensaje utilizado para finalizar una solicitud.
 #[derive(Message)]
 #[rtype(result = "")]
 pub struct FinishedWebServiceRequest(pub usize);
 
+/// Mensaje utilizado para cerrar la comunicacion.
 #[derive(Message)]
 #[rtype(result = "")]
 pub struct EndOfRequests;
