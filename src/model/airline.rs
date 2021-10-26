@@ -14,14 +14,6 @@ pub struct AirlineRequest(pub usize);
 
 #[derive(Message)]
 #[rtype(result = "")]
-<<<<<<< HEAD
-=======
-pub struct WaitAndProcessRequest;
-
-///Mensaje que representa el fin de la conexion con una aerolinea
-#[derive(Message)]
-#[rtype(result = "")]
->>>>>>> f55ed69982f7c25df15d5052a9ef3b765fb705cf
 pub struct ConnectionFinished(pub usize);
 
 ///Menaje que representa el fallo en una conexion
