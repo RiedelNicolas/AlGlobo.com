@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["InfoRequest","Clase auxiliar utilizada para contener la informacion de un request"],["Statistics","Clase que representa las estadisticas del sistema"]]});
