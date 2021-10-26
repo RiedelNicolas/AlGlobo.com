@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Message","Tipo de dato utilizado para encapsular los mensajes que envia la clase logger."]]});

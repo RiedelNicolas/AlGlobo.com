@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Logger","Instancia de un logger, es utilizado para guardar mensajes en el logFile. "]]});

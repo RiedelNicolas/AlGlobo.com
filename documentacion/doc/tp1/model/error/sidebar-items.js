@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["InternalError","Clase utilizada para manejar errores."]],"type":[["AppResult",""]]});

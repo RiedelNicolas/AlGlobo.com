@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["get_envs","Lee las variables de entorno de una ruta dada. Si la ruta no se puede encontrar, valores por defecto son asignados. Estos valores son:"]],"struct":[["Configuration",""]]});

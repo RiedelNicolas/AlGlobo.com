@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Id","A struct representing IDs usable for various purposes."]]});

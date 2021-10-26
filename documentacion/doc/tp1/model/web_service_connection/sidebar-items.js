@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["WebServiceConnection","Clase que modela un webservice"]]});
