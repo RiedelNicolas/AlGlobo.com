@@ -106,7 +106,7 @@ impl Handler<AirlineRequest> for Airline {
         addr.do_send(Request(req_id));
     }
 }
- 
+
 impl Handler<ConnectionFinished> for Airline {
     type Result = ();
     /// Handler que maneja la finalizacion de una conexion

@@ -28,9 +28,8 @@ pub struct AirlineConnection {
     logger: Addr<Logger>,
 }
 
-
 impl AirlineConnection {
-    /// Devuelve una instancia de un webservice de una aerolinea, 
+    /// Devuelve una instancia de un webservice de una aerolinea,
     /// en el constructor recibe los parametros necesarios para construirla
     pub fn new(
         airline_name: String,

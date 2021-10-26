@@ -102,7 +102,6 @@ impl Handler<NewRequest> for Administrator {
     }
 }
 
-
 impl Handler<FinishedWebServiceRequest> for Administrator {
     type Result = ();
     /// Handler para manejar la finalizacion de una solicitud.
@@ -131,7 +130,6 @@ impl Handler<FinishedWebServiceRequest> for Administrator {
         }
     }
 }
-
 
 impl Handler<EndOfRequests> for Administrator {
     type Result = ();

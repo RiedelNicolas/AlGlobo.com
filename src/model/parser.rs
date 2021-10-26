@@ -53,7 +53,7 @@ impl Handler<ReadNextLine> for Parser {
     type Result = ();
     /// Handler que lee la siguiente linea del archivo
     /// En caso de que la linea sea valida : envia la informacion necesaria al administrator
-    /// caso contrario, continua con la siguiente linea. 
+    /// caso contrario, continua con la siguiente linea.
     fn handle(&mut self, _msg: ReadNextLine, ctx: &mut Context<Self>) -> Self::Result {
         loop {
             let mut buffer = vec![];

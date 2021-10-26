@@ -9,7 +9,6 @@ pub struct InternalError {
     message: String,
 }
 
-
 impl InternalError {
     /// Genera una intancia de InternalError, el string recibido es utilizado para identificar el error.
     pub fn new(msg: &str) -> InternalError {
