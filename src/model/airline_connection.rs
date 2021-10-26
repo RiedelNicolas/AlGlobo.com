@@ -12,15 +12,17 @@ use std::ops::Range;
 use super::logger::Logger;
 use crate::model::logger_message::LoggerMessage;
 
+/// Mensaje que indica que se debe procesar una solicitud
 #[derive(Message)]
 #[rtype(result = "")]
 pub struct ProcessRequest;
 
-
+/// Mensaje que representa un request al webservice simulado.
 #[derive(Message)]
 #[rtype(result = "")]
 pub struct Request(pub usize);
 
+/// Mensaje que representa un request al webservice simulado.
 pub struct AirlineConnection {
     pending_requests: VecDeque<usize>,
     airline_name: String,
@@ -30,6 +32,7 @@ pub struct AirlineConnection {
     logger: Addr<Logger>
 }
 
+/// 
 impl AirlineConnection {
     
     pub fn new( airline_name: String,

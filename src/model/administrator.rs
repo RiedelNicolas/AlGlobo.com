@@ -9,18 +9,22 @@ use actix::prelude::*;
 use std::collections::HashMap;
 use super::configuration::Configuration;
 
+/// Mensaje utilizado para iniciar una nueva Solicitud.
 #[derive(Message)]
 #[rtype(result = "")]
 pub struct NewRequest(pub Request);
 
+/// Mensaje utilizado para finalizar una solicitud.
 #[derive(Message)]
 #[rtype(result = "")]
 pub struct FinishedWebServiceRequest(pub usize);
 
+/// Mensaje utilizado para cerrar la comunicacion.
 #[derive(Message)]
 #[rtype(result = "")]
 pub struct EndOfRequests;
 
+/// Clase encarga de manejar los distintos webservice y derivar las solicitudes.
 pub struct Administrator {
     pending_requests: HashMap<usize, (Request, u32)>,
     airlines: HashMap<String, Addr<Airline>>,
@@ -32,9 +36,14 @@ pub struct Administrator {
 }
 
 impl Administrator {
+<<<<<<< HEAD
     pub fn new( statistics: Addr<Statistics>, 
                 configuration: Configuration,
                 logger: Addr<Logger>) -> Administrator {
+=======
+    /// Genera una instancia de un Administrator
+    pub fn new(configuration: Configuration) -> Administrator {
+>>>>>>> 9c5c23660b848ccf2e72339e79b755871c6270a0
         Administrator {
             pending_requests: HashMap::new(),
             airlines: HashMap::new(),
@@ -45,7 +54,7 @@ impl Administrator {
             logger
         }
     }
-    
+    /// Actualiza las estadisticas internas. (Deberia ser privada?)
     pub fn update_statistics(&mut self, req: Request) {
 
         let info = InfoRequest {
@@ -67,11 +76,13 @@ impl Actor for Administrator {
             self.configuration.clone(),
             self.logger.clone()).start());
     }
+
 }
+
 
 impl Handler<NewRequest> for Administrator {
     type Result = ();
-
+    /// Handler que maneja la creacion de solicitudes.
     fn handle(&mut self, msg: NewRequest, ctx: &mut Context<Self>) -> Self::Result {
 
         let request = msg.0;
@@ -101,6 +112,7 @@ impl Handler<NewRequest> for Administrator {
     }
 }
 
+/// Handler para manejar la finalizacion de una solicitud.
 impl Handler<FinishedWebServiceRequest> for Administrator {
     type Result = ();
 
@@ -129,6 +141,7 @@ impl Handler<FinishedWebServiceRequest> for Administrator {
     }
 }
 
+/// Handler que maneja el fin de las solicitudes. (Cerrar la comunicacion)
 impl Handler<EndOfRequests> for Administrator {
     type Result = ();
 
