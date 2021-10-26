@@ -1,4 +1,4 @@
-use super::error::{AppResult};
+use super::error::AppResult;
 use std::time::{Duration, Instant};
 
 /// Representa un pedido de reserva particular.
@@ -10,9 +10,8 @@ pub struct Request {
     with_hotel: bool,
     arrival_time: Instant,
     completion_time: Duration,
-    finished: bool
+    finished: bool,
 }
-
 
 impl Request {
     /// Genera una instancia de una solicitud
@@ -25,7 +24,7 @@ impl Request {
             with_hotel,
             arrival_time: Instant::now(),
             completion_time: Duration::from_secs(0),
-            finished: false
+            finished: false,
         };
 
         Ok(request)
@@ -40,13 +39,13 @@ impl Request {
     pub fn is_package(&self) -> bool {
         self.with_hotel
     }
-    
+
     /// Marca request como finalizada y establece el tiempo de resolucion
     pub fn finish(&mut self) {
         self.finished = true;
         self.completion_time = self.arrival_time.elapsed();
     }
-    
+
     /// Devuelve true en caso de que la reserva se encuentre resuelta
     pub fn has_finished(&self) -> bool {
         self.finished

@@ -1,9 +1,9 @@
 use super::error::{AppResult, InternalError};
-use std_semaphore::Semaphore;
+use rand::Rng;
 use std::ops::Range;
 use std::sync::Arc;
 use std::{thread, time};
-use rand::Rng;
+use std_semaphore::Semaphore;
 
 /// Clase que modela un webservice
 pub struct WebServiceConnection {
@@ -13,12 +13,15 @@ pub struct WebServiceConnection {
 }
 
 impl WebServiceConnection {
-    
     /// Instancia un webservice
     /// Recibe un Semaphore para sincronismo.
     /// Una probabilidad de fallo (Para simular un webservice real).
-    /// Y un rango que sera utilizado para simular (mediante un aleatorio) cuanto tarda la consulta. 
-    pub fn new(permission: Arc<Semaphore>, work_time_range: Range<u64>, failure_probability: f32) -> Self {
+    /// Y un rango que sera utilizado para simular (mediante un aleatorio) cuanto tarda la consulta.
+    pub fn new(
+        permission: Arc<Semaphore>,
+        work_time_range: Range<u64>,
+        failure_probability: f32,
+    ) -> Self {
         WebServiceConnection {
             permission,
             work_time_range,
@@ -37,9 +40,9 @@ impl WebServiceConnection {
         self.permission.release();
 
         if ok {
-            Ok(()) 
+            Ok(())
         } else {
-            Err(Box::new(InternalError::new("Request could not be done"))) 
+            Err(Box::new(InternalError::new("Request could not be done")))
         }
     }
 }

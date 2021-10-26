@@ -4,33 +4,32 @@ use chrono::{DateTime, Local};
 
 /// Tipo de dato utilizado para encapsular los mensajes que envia la clase logger.
 pub struct Message {
-    message_type : MessageType,
-    text:String
+    message_type: MessageType,
+    text: String,
 }
 
 impl Message {
-
     /// Instancia un mensaje de tipo error.
-    pub fn new_error(in_text:String) -> Message {
+    pub fn new_error(in_text: String) -> Message {
         Message {
             text: in_text,
-            message_type: MessageType::Error
+            message_type: MessageType::Error,
         }
     }
 
     /// Instancia un mensaje de tipo Info.
-    pub fn new_info(in_text:String) -> Message {
+    pub fn new_info(in_text: String) -> Message {
         Message {
             text: in_text,
-            message_type: MessageType::Info
+            message_type: MessageType::Info,
         }
     }
 
     /// Instancia un mensaje de tipo Alerta.
-    pub fn new_warning(in_text:String) -> Message {
+    pub fn new_warning(in_text: String) -> Message {
         Message {
             text: in_text,
-            message_type: MessageType::Warning
+            message_type: MessageType::Warning,
         }
     }
 
@@ -38,14 +37,13 @@ impl Message {
     pub fn close() -> Message {
         Message {
             text: String::from("__CloseChannelSignal__"),
-            message_type: MessageType::Close
+            message_type: MessageType::Close,
         }
     }
 
     /// Devuelve el estado interno del String formateado como string.
-    pub fn generate_string (&self)->String {
-    
-        let aux : String;
+    pub fn generate_string(&self) -> String {
+        let aux: String;
         let now: DateTime<Local> = Local::now();
 
         match self.message_type {
@@ -54,12 +52,11 @@ impl Message {
             MessageType::Warning => aux = "WAR".to_string(),
             MessageType::Close => aux = "".to_string(),
         }
-        format!("{} - {} - {}", aux, now.format("%e %b %Y %T") ,self.text)
+        format!("{} - {} - {}", aux, now.format("%e %b %Y %T"), self.text)
     }
 
     /// Devuelve una referencia al tipo de mensaje.
     pub fn message_type(&self) -> &MessageType {
         &self.message_type
     }
-
 }
