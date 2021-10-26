@@ -17,6 +17,7 @@ pub struct ProcessRequest;
 #[rtype(result = "")]
 pub struct Request(pub usize);
 
+/// Clase utilizada para simular un webservice con un hotel.
 pub struct HotelConnection {
     pending_requests: VecDeque<usize>,
     hotel: Addr<Hotel>,
@@ -25,6 +26,7 @@ pub struct HotelConnection {
 }
 
 impl HotelConnection {
+    /// Constructor, debe recibir una instancia del logger para comunicar el avance del proceso.
     pub fn new(
         hotel: Addr<Hotel>,
         work_time_range: Range<usize>,
@@ -45,7 +47,7 @@ impl Actor for HotelConnection {
 
 impl Handler<Request> for HotelConnection {
     type Result = ();
-
+    /// Handler para manejar solicitudes entrantes
     fn handle(&mut self, msg: Request, ctx: &mut Context<Self>) -> Self::Result {
         if self.pending_requests.is_empty() {
             ctx.address().do_send(ProcessRequest);

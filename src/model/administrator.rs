@@ -102,10 +102,10 @@ impl Handler<NewRequest> for Administrator {
     }
 }
 
-/// Handler para manejar la finalizacion de una solicitud.
+
 impl Handler<FinishedWebServiceRequest> for Administrator {
     type Result = ();
-
+    /// Handler para manejar la finalizacion de una solicitud.
     fn handle(&mut self, msg: FinishedWebServiceRequest, _ctx: &mut Context<Self>) -> Self::Result {
         let id = msg.0;
         if let Some((_, stages_left)) = self.pending_requests.get_mut(&id) {
@@ -132,10 +132,10 @@ impl Handler<FinishedWebServiceRequest> for Administrator {
     }
 }
 
-/// Handler que maneja el fin de las solicitudes. (Cerrar la comunicacion)
+
 impl Handler<EndOfRequests> for Administrator {
     type Result = ();
-
+    /// Handler que maneja el fin de las solicitudes. (Cerrar la comunicacion)
     fn handle(&mut self, _msg: EndOfRequests, _ctx: &mut Context<Self>) -> Self::Result {
         self.keep_going = false;
     }

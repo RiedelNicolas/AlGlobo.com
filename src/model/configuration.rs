@@ -37,7 +37,9 @@ impl Configuration {
         }
     }
 }
-
+/// Devuelve una instancia del struct configuration cargado
+/// En caso que se encuentre el json ubicado en el parametro path se cargara el mismo
+/// Caso contrario se cargara una configuracion por defecto.
 pub fn get_envs<P: AsRef<Path>>(path: P, logger: Addr<Logger>) -> Configuration {
     let file = match File::open(path) {
         Ok(r) => r,

@@ -18,7 +18,7 @@ pub struct ProcessRequest;
 #[rtype(result = "")]
 pub struct Request(pub usize);
 
-/// Mensaje que representa un request al webservice simulado.
+/// Clase que simula un webservice de una aerolinea
 pub struct AirlineConnection {
     pending_requests: VecDeque<usize>,
     airline_name: String,
@@ -28,8 +28,10 @@ pub struct AirlineConnection {
     logger: Addr<Logger>,
 }
 
-///
+
 impl AirlineConnection {
+    /// Devuelve una instancia de un webservice de una aerolinea, 
+    /// en el constructor recibe los parametros necesarios para construirla
     pub fn new(
         airline_name: String,
         airline: Addr<Airline>,
@@ -54,7 +56,7 @@ impl Actor for AirlineConnection {
 
 impl Handler<Request> for AirlineConnection {
     type Result = ();
-
+    /// Handler que maneja la solicitud de una reserva a dicho webservice
     fn handle(&mut self, msg: Request, ctx: &mut Context<Self>) -> Self::Result {
         if self.pending_requests.is_empty() {
             ctx.address().do_send(ProcessRequest);
@@ -65,7 +67,8 @@ impl Handler<Request> for AirlineConnection {
 
 impl Handler<ProcessRequest> for AirlineConnection {
     type Result = ResponseActFuture<Self, ()>;
-
+    /// Handler que maneja el procesamiento de una request, en caso de que la aerolinea rechace
+    /// la reserva volvera a intentar en unos segundos hasta que la misma sea aceptada.
     fn handle(&mut self, _msg: ProcessRequest, _ctx: &mut Context<Self>) -> Self::Result {
         let id = self
             .pending_requests
