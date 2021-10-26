@@ -66,16 +66,14 @@ impl Statistics {
             "[Statistics] Requests Amount: {}",
             self.requests_amount
         )));
-        self.logger.do_send(LoggerMessage::new_info(format!(
-            "[Statistics] Total Request Time: {}s",
-            self.total_time.as_secs()
-        )));
+
         self.logger.do_send(LoggerMessage::new_info(format!(
             "[Statistics] Average Request Time: {}s",
             (self.total_time.as_secs() / self.requests_amount as u64)
         )));
         self.logger.do_send(LoggerMessage::new_info(format!(
-            "[Statistics] Top 10 Requested Routes: {}",
+            "[Statistics] Top {} Requested Routes: {}",
+            self.top_req_amount,
             top_req_str
         )));
     }
