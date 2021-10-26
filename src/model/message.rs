@@ -10,7 +10,7 @@ pub struct Message {
 
 impl Message {
 
-    /// Instancia un mensaje de tipo error
+    /// Instancia un mensaje de tipo error.
     pub fn new_error(in_text:String) -> Message {
         Message {
             text: in_text,
@@ -18,7 +18,7 @@ impl Message {
         }
     }
 
-    /// Instancia un mensaje de tipo Info
+    /// Instancia un mensaje de tipo Info.
     pub fn new_info(in_text:String) -> Message {
         Message {
             text: in_text,
@@ -26,7 +26,7 @@ impl Message {
         }
     }
 
-    /// Instancia un mensaje de tipo Alerta
+    /// Instancia un mensaje de tipo Alerta.
     pub fn new_warning(in_text:String) -> Message {
         Message {
             text: in_text,
@@ -57,7 +57,7 @@ impl Message {
         format!("{} - {} - {}", aux, now.format("%e %b %Y %T") ,self.text)
     }
 
-    /// Get a reference to the message's message type.
+    /// Devuelve una referencia al tipo de mensaje.
     pub fn message_type(&self) -> &MessageType {
         &self.message_type
     }

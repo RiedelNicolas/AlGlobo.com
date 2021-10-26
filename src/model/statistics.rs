@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::time::Duration;
+use super::env::Configuration;
 use super::logger::Logger;
 
 /// Clase auxiliar utilizada para contener la informacion de un request
@@ -29,20 +30,25 @@ pub struct Statistics {
   total_time: Duration,
   requests_amount: u64,
   logger: Logger,
+  log_rate: u64,
+  top_req_amount: usize
 }
 
 
 impl Statistics {
     /// Genera una instancia de la clase.
     /// Recibe una referencia al logger donde debe enviar los distintos errores que se le presentan
-    pub fn new( in_logger : Logger) -> Self { 
+    pub fn new( in_logger : Logger, envs: Configuration ) -> Self { 
         Self { 
             routes_requested: HashMap::new(),
             total_time: Duration::from_secs(0),
             requests_amount: 0,
             logger: in_logger,
+            log_rate: envs.stats_log_rate,
+            top_req_amount: envs.stats_top_req_amount,
         }
     }
+
     /// Actualiza la estadisticas
     pub fn update(&mut self, req: InfoRequest) {
         let route = req.route();
@@ -53,10 +59,11 @@ impl Statistics {
         
         *self.routes_requested.entry(route).or_insert(0) += 1;
 
-        if self.requests_amount % 5 == 0 { // traer de env
+        if self.requests_amount % self.log_rate == 0 {
             self.log_data();
         }
     }
+
     /// Imprime las estadisticas generadas en el log file
     pub fn log_data(&self) {
         let mut top_requested: Vec<(&String, &u32)> = Vec::new();
@@ -66,7 +73,7 @@ impl Statistics {
         top_requested.sort_by_key(|k| k.1);
         
         let mut top_req_str: String = String::new();
-        let index = if top_requested.len() > 10 { 10 } else { top_requested.len() }; // VER SI NO PONER EN ENV ESTO
+        let index = if top_requested.len() > self.top_req_amount { self.top_req_amount } else { top_requested.len() };
         
         for i in 0..index {
             top_req_str.push_str(top_requested[i].0);

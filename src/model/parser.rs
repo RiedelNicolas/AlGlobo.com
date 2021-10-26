@@ -27,12 +27,13 @@ impl Parser {
             matcher: Regex::new(r"^([A-Z]{3}),([A-Z]{3}),([A-z]+),([PV])$")?,
             logger : in_logger.clone()
         };
+
         in_logger.log_info(String::from("[Parser] CSV with requests successfully opened") );
         Ok(parser)
     }
 
-    /// Parsea el archivo de request
-    /// **Alerta** : Metodo bloqueante,finaliza al terminar de procesar los requests.
+    /// Parsea el archivo de request.
+    /// Metodo bloqueante, finaliza al terminar de procesar los requests.
     pub fn parse_request(&mut self) -> AppResult<Option<Request>> {
 
         loop {
@@ -47,9 +48,10 @@ impl Parser {
             let buffer = String::from_utf8(buffer)?.replace("\n", "");
 
             let cap = match self.matcher.captures(&buffer) {
-                None => {
+                None => { //Si no matchea se ignora el pedido
                     self.logger.log_warning(String::from("[Parser] Invalid line on Requests CSV, continuing anyway")  );
-                    continue}, //Si no matchea se ignora el pedido
+                    continue
+                }, 
                 Some(value) =>{
                     self.logger.log_info(format!("[Parser] Request read from '{}' to '{}' flying with '{}' requesting hotel '{}' ",
                     &value[1], &value[2], &value[3], &value[4]=="P"));

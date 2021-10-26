@@ -43,8 +43,8 @@ impl WebServiceProvider {
 
     /// Simula un request a un hotel.
     pub fn hotel_request(&mut self, envs: Configuration) -> WebServiceConnection {
-        self.logger.log_info("[WebServiceProvider] Sending request to the hotel".to_string()); //CHEQUEAR
-        WebServiceConnection::new(self.hotels.clone(), envs.hotel_min_work_time..envs.hotel_max_work_time, envs.hotel_failure_probability)
+        self.logger.log_info("[WebServiceProvider] Sending request to the hotel".to_string());
+        WebServiceConnection::new(self.hotels.clone(), envs.hotel_min_work_time..envs.hotel_max_work_time, 0.0)
     }
 
 }

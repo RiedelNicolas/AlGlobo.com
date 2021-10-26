@@ -11,13 +11,14 @@ pub struct Configuration {
     pub air_min_work_time: u64,
     pub air_max_work_time: u64,
     pub hotel_limit: u32,
-    pub hotel_failure_probability: f32,
     pub hotel_min_work_time: u64,
     pub hotel_max_work_time: u64,
-    pub sleeping_retry_time: u64
+    pub sleeping_retry_time: u64,
+    pub stats_log_rate: u64,
+    pub stats_top_req_amount: usize
 }
 
-/// *Class* used to set the environment variables.
+/// Clase utilizada para la configuracion de variables de entorno.
 impl Configuration {
     fn new() -> Self {
         Self {
@@ -26,22 +27,22 @@ impl Configuration {
             air_min_work_time: 1000,
             air_max_work_time: 4000, 
             hotel_limit: 10, 
-            hotel_failure_probability: 0.1, 
             hotel_min_work_time: 1000, 
             hotel_max_work_time: 4000, 
-            sleeping_retry_time: 1000 
+            sleeping_retry_time: 1000,
+            stats_log_rate: 5,
+            stats_top_req_amount: 10
         }
     }
 }
 
-/// Reads the Environmnents values from the given path.
-/// If the file couldnt be found, default values are asigned.
-/// These values are :
+/// Lee las variables de entorno de una ruta dada.
+/// Si la ruta no se puede encontrar, valores por defecto son asignados.
+/// Estos valores son:
 /// * airline_limit: 10
 /// * air_failure_probability: 0.1
 /// * air_max_work_time: 4000
 /// * hotel_limit: 10
-/// * hotel_failure_probability: 0.1
 /// * hotel_min_work_time: 1000
 /// * hotel_max_work_time: 4000
 /// * sleeping_retry_time: 1000

@@ -29,8 +29,9 @@ impl LogHandler {
             logger: Some(thread::spawn( move || LogHandler::print_received(receiver, log_file)))
         }
     }
+
     /// Imprime todos los mensajes que estan esperando en la cola.
-    /// **Peligro** : Es un metodo bloqueante
+    /// Es un metodo bloqueante.
     fn print_received(rx: std::sync::mpsc::Receiver<message::Message>, mut log_file: File) {
         loop {
             match rx.recv() {
@@ -40,26 +41,27 @@ impl LogHandler {
                         _ => {
                             match writeln!(log_file, "{}", r.generate_string() ) {
                                 Ok(v) => v,
-                                Err(e) => println!("Error found trying to write the logfile : {}", e)
+                                Err(e) => println!("[LogHandler] Error found trying to write the logfile : {}", e)
                             }
                         }
                     }
                 }
                 Err(e) => {
-                    println!("{}",e);
-                    return; //posiblemente cerraron el channel, cortamos el loop.
+                    println!("[LogHandler] {}",e);
+                    return; // posiblemente cerraron el channel, cortamos el loop.
                 }
             }
         }
     }
 
     /// Devuelve una instancia de un Logger.
-    /// Este es usado para enviar los mensajes que se desean imprimir en el log_file
+    /// Este es usado para enviar los mensajes que se desean imprimir en el log_file.
     pub fn get_transmitter(&self) -> Logger {
         Logger::new( &self.tx.clone() )
     }
 
-    /// Bloqueante, espera a que se impriman todos los mensajes recibidos. 
+    /// Espera a que se impriman todos los mensajes recibidos.
+    /// Es un metodo bloqueante.
     pub fn join(self) {
         if let Some(logger) = self.logger { let _ = logger.join(); }
     }

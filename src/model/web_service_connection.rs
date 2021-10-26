@@ -26,6 +26,8 @@ impl WebServiceConnection {
         }
     }
 
+    /// Simula una conexion a un web service externo.
+    /// Retorna Err en caso de fallo de conexion u Ok vacio en caso exitoso.
     pub fn resolve_request(&self) -> AppResult<()> {
         self.permission.acquire();
         let mut rng = rand::thread_rng();

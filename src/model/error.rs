@@ -1,7 +1,6 @@
 use std::error::Error;
 use std::fmt;
 
-
 pub type AppResult<T> = std::result::Result<T, Box<dyn Error>>;
 
 /// Clase utilizada para manejar errores.

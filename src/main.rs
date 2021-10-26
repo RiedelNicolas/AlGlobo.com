@@ -9,13 +9,14 @@ use model::env;
 use model::log_handler::LogHandler;
 use std::sync::{Arc, Mutex};
 
+/// COMPLETAR
 fn process_requests(csv_path: &str, json_path: &str, log_path : &str) -> AppResult<()>{
 
     let log = LogHandler::new(log_path);
     let envs = env::get_envs(json_path, log.get_transmitter() );
+    let statistics = Arc::new(Mutex::new(Statistics::new( log.get_transmitter(), envs )));
     let mut parser = Parser::open(std::path::Path::new(csv_path), log.get_transmitter() )?;
     let mut web_provider = WebServiceProvider::new(envs.airline_limit, envs.hotel_limit, log.get_transmitter() );
-    let statistics = Arc::new(Mutex::new(Statistics::new( log.get_transmitter() )));
     let mut handlers: Vec<RequestHandler> = Vec::new();
     
     let logger = log.get_transmitter();
@@ -24,20 +25,21 @@ fn process_requests(csv_path: &str, json_path: &str, log_path : &str) -> AppResu
 
     loop {
         match parser.parse_request()? {
-            None => break,  //Finalizamos
+            None => break,  // Finalizamos
             Some(request) => {
                 let stats_clone = statistics.clone();
+                
                 //Levantar thread
                 match RequestHandler::spawn(request, &mut web_provider, envs,
                                         logger.clone(), stats_clone) {
                     Ok(handler) => handlers.push(handler),
                     Err(error) => {
-                        logger.log_error(format!("{:?}", error));
+                        logger.log_error(format!("[Main] {:?}", error));
                     }
                 };
             }
         }
-       clean_finished(&mut handlers);
+        clean_finished(&mut handlers);
     }
 
     for handler in handlers {
@@ -49,7 +51,7 @@ fn process_requests(csv_path: &str, json_path: &str, log_path : &str) -> AppResu
             stats.log_data();
         },
         Err(_) => {
-            logger.log_error(String::from("Fatal error: Poisoned Lock"));
+            logger.log_error(String::from("[Main] Fatal error at statistics log_data: Poisoned Lock"));
         }
     }
 
@@ -60,8 +62,10 @@ fn process_requests(csv_path: &str, json_path: &str, log_path : &str) -> AppResu
     Ok(())
 }
 
+/// COMPLETAR
 fn clean_finished(handlers: &mut Vec<RequestHandler>) {
     let mut i = 0;
+
     while i < handlers.len() {
         if handlers[i].has_finished() {
             let req = handlers.remove(i);
