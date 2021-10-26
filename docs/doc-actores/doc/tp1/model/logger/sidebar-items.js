@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Logger","Clase Logger"]]});

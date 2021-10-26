@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["administrator",""],["airline",""],["airline_connection",""],["configuration",""],["error",""],["hotel",""],["hotel_connection",""],["logger",""],["logger_message",""],["message_type",""],["parser",""],["request",""],["statistics",""]]});

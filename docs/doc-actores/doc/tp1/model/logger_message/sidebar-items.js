@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["LoggerMessage","Mensaje utilizado para enviar los mensajes que debe imprimir el logger."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["HotelConnection","Clase utilizada para simular un webservice con un hotel."],["ProcessRequest",""],["Request",""]]});

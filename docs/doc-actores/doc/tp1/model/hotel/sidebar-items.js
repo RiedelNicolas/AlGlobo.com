@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ConnectionFinished",""],["Hotel","Clase que representa un hotel, encargado de manejar las distintas conexiones simuladas. ACLARACION : Se considera a el hotel como unico."],["HotelRequest",""],["WaitAndProcessRequest",""]]});

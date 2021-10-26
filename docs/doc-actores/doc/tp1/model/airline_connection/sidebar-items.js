@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["AirlineConnection","Clase que simula un webservice de una aerolinea"],["ProcessRequest","Mensaje que indica que se debe procesar una solicitud"],["Request","Mensaje que representa un request al webservice simulado."]]});

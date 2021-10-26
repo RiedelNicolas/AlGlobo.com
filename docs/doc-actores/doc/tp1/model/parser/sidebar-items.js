@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Parser","Clase utilizada para parsear el archivo csv con las solicitudes a procesar."],["ReadNextLine",""]]});
