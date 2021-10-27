@@ -96,7 +96,8 @@ impl Statistics {
             (self.total_time.as_secs() / self.requests_amount)
         ));
         self.logger.log_info(format!(
-            "[Statistics] Top 10 Requested Routes: {}",
+            "[Statistics] Top {} Requested Routes: {}",
+            self.top_req_amount,
             top_req_str
         ));
     }
