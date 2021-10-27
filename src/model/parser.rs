@@ -68,7 +68,7 @@ impl Parser {
                     ));
                     continue;
                 }
-                Some(value) => value
+                Some(value) => value,
             };
 
             // Simulacion tiempo de arribo
@@ -76,8 +76,13 @@ impl Parser {
             let arrival_time = rng.gen_range(self.req_arrival_range.clone());
             thread::sleep(time::Duration::from_millis(arrival_time as u64));
 
-            self.logger.log_info(format!("[Parser] Request read from '{}' to '{}' flying with '{}' requesting hotel '{}' ",
-                    &cap[1], &cap[2], &cap[3], &cap[4]=="P"));
+            self.logger.log_info(format!(
+                "[Parser] Request read from '{}' to '{}' flying with '{}' requesting hotel '{}' ",
+                &cap[1],
+                &cap[2],
+                &cap[3],
+                &cap[4] == "P"
+            ));
 
             let request = Request::new(&cap[1], &cap[2], &cap[3], &cap[4] == "P")?;
             return Ok(Some(request));

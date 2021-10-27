@@ -79,11 +79,11 @@ impl RequestHandler {
         let rh_string = format!("[RequestHandler: {}]", id);
 
         logger.log_info(format!(
-            "{} Connecting to airline extern web-service",
+            "{} Trying to connect to airline extern web-service",
             rh_string
         ));
         loop {
-            match connection.resolve_request() {
+            match connection.resolve_request(id) {
                 Ok(_) => {
                     logger.log_info(format!("{} Airline request completed", rh_string));
                     break;
@@ -134,7 +134,7 @@ impl RequestHandler {
             "{} Trying to connect to hotel extern web-service",
             rh_string
         ));
-        let _ = connection.resolve_request(); // Las request al hotel no fallan
+        let _ = connection.resolve_request(id); // Las request al hotel no fallan
         logger.log_info(format!("{} Hotel request completed", rh_string));
         barrier.wait();
     }
